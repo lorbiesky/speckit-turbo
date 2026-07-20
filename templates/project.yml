@@ -1,0 +1,27 @@
+project:
+  name: change-me
+  type: other
+  stack: generic
+
+workflow:
+  require_clarification: true
+  require_plan_approval: true
+  require_tests: true
+  require_final_review: true
+
+quality:
+  lint: true
+  unit_tests: true
+  build: true
+  accessibility: false
+  security_review: true
+
+commands:
+  install: replace-with-project-install-command
+  lint: replace-with-project-lint-command
+  test: replace-with-project-test-command
+  build: replace-with-project-build-command
+
+documentation:
+  update_readme_when_needed: true
+  create_adr_for_architecture_decisions: true
