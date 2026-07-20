@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://speckit-turbo.dev/schemas/project-profile.schema.json",
+  "title": "Spec Kit Turbo Project Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["project", "workflow", "quality", "commands"],
+  "properties": {
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type", "stack"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "type": { "enum": ["frontend", "backend", "fullstack", "library", "other"] },
+        "stack": { "type": "string", "minLength": 1 }
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["require_clarification", "require_plan_approval", "require_tests", "require_final_review"],
+      "properties": {
+        "require_clarification": { "type": "boolean" },
+        "require_plan_approval": { "type": "boolean" },
+        "require_tests": { "type": "boolean" },
+        "require_final_review": { "type": "boolean" }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "lint": { "type": "boolean", "default": true },
+        "unit_tests": { "type": "boolean", "default": true },
+        "build": { "type": "boolean", "default": true },
+        "accessibility": { "type": "boolean", "default": false },
+        "security_review": { "type": "boolean", "default": true }
+      }
+    },
+    "commands": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "minLength": 1 },
+      "properties": {
+        "install": { "type": "string" },
+        "lint": { "type": "string" },
+        "test": { "type": "string" },
+        "build": { "type": "string" }
+      }
+    },
+    "documentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "update_readme_when_needed": { "type": "boolean", "default": true },
+        "create_adr_for_architecture_decisions": { "type": "boolean", "default": true }
+      }
+    }
+  }
+}
