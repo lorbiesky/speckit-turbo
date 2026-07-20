@@ -24,7 +24,6 @@ cp -R "$SOURCE_ROOT/schemas" "$TARGET/.specify/turbo/runtime/"
 cp -R "$SOURCE_ROOT/workflows" "$TARGET/.specify/turbo/runtime/"
 cp "$SOURCE_ROOT/AGENTS.md" "$TARGET/.specify/turbo/AGENTS.turbo.md"
 cp "$SOURCE_ROOT/scripts/doctor.py" "$TARGET/.specify/turbo/doctor.py"
-cp "$SOURCE_ROOT/scripts/validate.py" "$TARGET/.specify/turbo/validate.py"
 
 if [ ! -f "$TARGET/.specify/turbo/project.yml" ]; then
   cp "$SOURCE_ROOT/templates/project.yml" "$TARGET/.specify/turbo/project.yml"
