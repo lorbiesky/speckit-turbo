@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "turboVersion": "1.0.3",
+  "turboVersion": "1.0.4",
   "source": "https://github.com/lorbiesky/speckit-turbo",
   "specKit": {
     "integration": "codex",
