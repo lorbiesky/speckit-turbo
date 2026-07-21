@@ -1,0 +1,24 @@
+{
+  "manifestVersion": 1,
+  "turboVersion": "1.0.1",
+  "source": "https://github.com/lorbiesky/speckit-turbo",
+  "specKit": {
+    "integration": "codex",
+    "minimumConcepts": ["specify", "plan", "tasks", "implement"]
+  },
+  "managedPaths": [
+    ".agents/skills/turbo-*",
+    ".specify/turbo/AGENTS.turbo.md",
+    ".specify/turbo/doctor.py",
+    ".specify/turbo/turbo.js",
+    ".specify/turbo/node-runtime",
+    ".specify/turbo/workflow_runtime.py",
+    ".specify/turbo/manifest.json",
+    ".specify/turbo/runtime/schemas",
+    ".specify/turbo/runtime/workflows",
+    ".specify/turbo/templates/constitution-*",
+    ".specify/turbo/templates/visual-spec.md",
+    ".specify/turbo/project.yml",
+    ".specify/turbo/state.json"
+  ]
+}

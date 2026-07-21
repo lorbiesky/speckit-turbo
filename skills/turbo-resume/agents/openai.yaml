@@ -1,0 +1,4 @@
+interface:
+  display_name: "Turbo Resume"
+  short_description: "Retome um workflow Turbo interrompido"
+  default_prompt: "Use $turbo-resume para continuar o trabalho."

@@ -14,7 +14,7 @@ try:
     from jsonschema import Draft202012Validator, FormatChecker
 except ImportError as exc:  # pragma: no cover - exercised by local setup failures
     print(
-        "Missing validation dependencies. Run: python -m pip install -r requirements-dev.txt",
+        "Missing validation dependencies. Run: python3 -m pip install -r requirements-dev.txt",
         file=sys.stderr,
     )
     raise SystemExit(2) from exc
@@ -88,6 +88,13 @@ def main() -> int:
     required_templates = {
         "project.yml",
         "state.json",
+        "spec.md",
+        "clarifications.md",
+        "plan.md",
+        "tasks.md",
+        "constitution-interview.md",
+        "constitution.draft.md",
+        "visual-spec.md",
         "delivery-summary.md",
         "bug-evidence.md",
         "root-cause.md",
@@ -112,6 +119,9 @@ def main() -> int:
         schemas.get("workflow-state.schema.json"),
         "templates/state.json",
     )
+
+    manifest = load_json(ROOT / "manifest.json")
+    validate_instance(manifest, schemas.get("manifest.schema.json"), "manifest.json")
 
     skills: dict[str, Path] = {}
     for path in sorted((ROOT / "skills").glob("*/SKILL.md")):
@@ -144,6 +154,8 @@ def main() -> int:
     )
     workflow_classifications: dict[str, Path] = {}
     workflow_count = 0
+    supported_conditions = {"visual_input_present", "visual_input_absent_or_completed"}
+    supported_checkpoints = {"always", "when_configured"}
 
     for path in sorted((ROOT / "workflows").glob("*.yml")):
         workflow_count += 1
@@ -177,6 +189,7 @@ def main() -> int:
             continue
 
         phase_ids: set[str] = set()
+        provided_facts: set[str] = set()
         for index, phase in enumerate(phases):
             label = f"{path.relative_to(ROOT)}: phases[{index}]"
             if not isinstance(phase, dict):
@@ -204,6 +217,36 @@ def main() -> int:
             elif len(requirements) != len(set(requirements)):
                 fail(f"{label}: gate.require contains duplicates")
 
+            outputs = phase.get("outputs", [])
+            if outputs is not None and (not isinstance(outputs, list) or not all(isinstance(item, str) and item for item in outputs)):
+                fail(f"{label}: outputs must be a list of non-empty paths")
+
+            condition = phase.get("condition")
+            if condition is not None and condition not in supported_conditions:
+                fail(f"{label}: unsupported condition '{condition}'")
+
+            checkpoint = phase.get("human_checkpoint")
+            if checkpoint is not None and checkpoint not in supported_checkpoints:
+                fail(f"{label}: unsupported human_checkpoint '{checkpoint}'")
+
+            facts_before_phase = set(provided_facts)
+            preconditions = phase.get("preconditions", [])
+            if preconditions is not None and (not isinstance(preconditions, list) or not all(isinstance(item, str) and item for item in preconditions)):
+                fail(f"{label}: preconditions must be a list of non-empty facts")
+            elif isinstance(preconditions, list):
+                unresolved = set(preconditions) - facts_before_phase
+                if unresolved:
+                    fail(f"{label}: preconditions must be provided by an earlier phase: {', '.join(sorted(unresolved))}")
+
+            provides = phase.get("provides", [])
+            if provides is not None and (not isinstance(provides, list) or not all(isinstance(item, str) and item for item in provides)):
+                fail(f"{label}: provides must be a list of non-empty facts")
+            elif isinstance(provides, list):
+                duplicates = set(provides) & provided_facts
+                if duplicates:
+                    fail(f"{label}: facts are already provided by another phase: {', '.join(sorted(duplicates))}")
+                provided_facts.update(provides)
+
             invokes = phase.get("invokes", [])
             if invokes is not None and not isinstance(invokes, list):
                 fail(f"{label}: invokes must be a list")
@@ -211,9 +254,18 @@ def main() -> int:
                 for invoked in invokes:
                     if isinstance(invoked, str) and invoked.startswith("turbo-") and invoked not in skills:
                         fail(f"{label}: invoked skill '{invoked}' does not exist")
+                    if isinstance(invoked, str) and invoked.startswith("speckit-") and invoked not in {
+                        "speckit-constitution", "speckit-specify", "speckit-clarify",
+                        "speckit-plan", "speckit-tasks", "speckit-analyze",
+                        "speckit-checklist", "speckit-implement",
+                    }:
+                        fail(f"{label}: unsupported Spec Kit command '{invoked}'")
 
     if workflow_count == 0:
         fail("workflows/: no workflows found")
+    missing_workflows = allowed_classifications - set(workflow_classifications)
+    if missing_workflows:
+        fail("workflows/: classifications without a workflow: " + ", ".join(sorted(missing_workflows)))
 
     if ERRORS:
         print(f"Validation failed with {len(ERRORS)} error(s):", file=sys.stderr)

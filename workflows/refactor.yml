@@ -6,16 +6,25 @@ state_file: .specify/turbo/state.json
 phases:
   - id: intake
     owner: turbo-orchestrator
+    provides:
+      - project_profile_loaded
+      - refactor_intake_complete
     gate:
       require:
         - motivation_recorded
         - behavioral_invariants_declared
         - project_profile_loaded
+    on_blocked: pause_and_record
 
   - id: architecture-analysis
     owner: turbo-architect
+    provides:
+      - architecture_analysis_complete
+    preconditions:
+      - refactor_intake_complete
     outputs:
       - refactor-analysis.md
+    on_blocked: pause_and_record
     gate:
       require:
         - current_structure_evidenced
@@ -25,6 +34,11 @@ phases:
 
   - id: regression-baseline
     owner: turbo-test-engineer
+    provides:
+      - regression_baseline_ready
+    preconditions:
+      - architecture_analysis_complete
+    on_blocked: pause_and_record
     gate:
       require:
         - critical_invariants_have_coverage
@@ -33,6 +47,10 @@ phases:
 
   - id: transformation-plan
     owner: turbo-architect
+    provides:
+      - transformation_plan_ready
+    preconditions:
+      - regression_baseline_ready
     invokes:
       - speckit-plan
       - speckit-tasks
@@ -40,6 +58,7 @@ phases:
     outputs:
       - plan.md
       - tasks.md
+    on_blocked: pause_and_record
     gate:
       require:
         - incremental_steps_defined
@@ -48,9 +67,14 @@ phases:
         - task_order_and_dependencies_explicit
 
   - id: implementation
-    owner: stack-specialist
+    owner: turbo-implementation-specialist
+    provides:
+      - implementation_ready
+    preconditions:
+      - transformation_plan_ready
     invokes:
       - speckit-implement
+    on_blocked: pause_and_record
     gate:
       require:
         - invariants_preserved_per_increment
@@ -59,6 +83,11 @@ phases:
 
   - id: validation
     owner: turbo-test-engineer
+    provides:
+      - validation_ready
+    preconditions:
+      - implementation_ready
+    on_blocked: pause_and_record
     gate:
       require:
         - baseline_and_final_results_compared
@@ -67,6 +96,11 @@ phases:
 
   - id: review
     owner: turbo-code-reviewer
+    provides:
+      - review_ready
+    preconditions:
+      - validation_ready
+    on_blocked: pause_and_record
     gate:
       require:
         - structural_goal_achieved
@@ -76,6 +110,8 @@ phases:
 
   - id: delivery
     owner: turbo-orchestrator
+    preconditions:
+      - review_ready
     outputs:
       - delivery-summary.md
     gate:
@@ -83,3 +119,4 @@ phases:
         - before_after_summary_recorded
         - validation_evidence_recorded
         - deferred_cleanup_recorded
+    on_blocked: pause_and_record

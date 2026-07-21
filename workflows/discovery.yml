@@ -1,0 +1,40 @@
+name: discovery
+version: 1
+classification: discovery
+state_file: .specify/turbo/state.json
+
+phases:
+  - id: intake
+    owner: turbo-orchestrator
+    provides: [discovery_scope_recorded]
+    outputs: [.specify/turbo/state.json]
+    gate:
+      require: [question_or_opportunity_recorded, project_profile_loaded, desired_decision_defined]
+    on_blocked: pause_and_record
+
+  - id: research
+    owner: turbo-architect
+    provides: [research_complete]
+    preconditions: [discovery_scope_recorded]
+    outputs: [research.md]
+    gate:
+      require: [repository_or_external_evidence_cited, alternatives_compared, unknowns_recorded]
+    on_blocked: pause_and_record
+
+  - id: recommendation
+    owner: turbo-product-owner
+    provides: [recommendation_ready]
+    preconditions: [research_complete]
+    outputs: [delivery-summary.md]
+    human_checkpoint: when_configured
+    gate:
+      require: [recommendation_and_tradeoffs_recorded, next_decision_explicit, no_implementation_committed]
+    on_blocked: pause_and_record
+
+  - id: delivery
+    owner: turbo-orchestrator
+    preconditions: [recommendation_ready]
+    outputs: [delivery-summary.md]
+    gate:
+      require: [evidence_summarized, risks_and_followups_recorded, decision_owner_identified]
+    on_blocked: pause_and_record

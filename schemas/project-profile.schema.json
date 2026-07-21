@@ -19,12 +19,13 @@
     "workflow": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["require_clarification", "require_plan_approval", "require_tests", "require_final_review"],
+      "required": ["require_clarification", "require_plan_approval", "require_tests", "require_final_review", "human_checkpoints"],
       "properties": {
         "require_clarification": { "type": "boolean" },
         "require_plan_approval": { "type": "boolean" },
         "require_tests": { "type": "boolean" },
         "require_final_review": { "type": "boolean" }
+        ,"human_checkpoints": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true, "default": [] }
       }
     },
     "quality": {
@@ -54,6 +55,39 @@
       "properties": {
         "update_readme_when_needed": { "type": "boolean", "default": true },
         "create_adr_for_architecture_decisions": { "type": "boolean", "default": true }
+      }
+    },
+    "specKit": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "version": { "type": "string", "minLength": 1 },
+        "integration": { "type": "string", "minLength": 1 }
+      }
+    },
+    "constitution": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "require_human_approval": { "type": "boolean", "default": true },
+        "themes": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        }
+      }
+    },
+    "visual": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "persist_references": { "type": "boolean", "default": false },
+        "references_path": { "type": "string", "minLength": 1, "default": ".specify/visual-references" },
+        "require_visual_acceptance": { "type": "boolean", "default": true },
+        "visual_regression": { "type": "boolean", "default": false },
+        "command": { "type": "string", "minLength": 1 }
       }
     }
   }

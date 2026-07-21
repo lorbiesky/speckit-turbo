@@ -1,0 +1,4 @@
+interface:
+  display_name: "Turbo Feature"
+  short_description: "Inicie uma feature orientada por specs"
+  default_prompt: "Use $turbo-feature para iniciar esta feature."

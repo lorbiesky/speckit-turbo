@@ -37,6 +37,7 @@ Choose exactly one primary type:
 - `discovery`: investigates feasibility, causes, constraints, or options;
 - `maintenance`: upgrades, tooling, documentation, or operational work;
 - `hotfix`: urgent production correction requiring a shortened but auditable path.
+- `constitution`: creates or evolves project engineering principles through the Socratic constitution workflow.
 
 When classification is uncertain, pause and present the competing interpretations and their workflow impact.
 
@@ -81,7 +82,16 @@ When classification is uncertain, pause and present the competing interpretation
 2. inspect available evidence;
 3. run bounded investigation;
 4. document findings, confidence, risks, and recommendation;
-5. stop before implementation unless explicitly authorized.
+    5. stop before implementation unless explicitly authorized.
+
+### Constitution
+
+1. diagnose repository and configuration;
+2. run or resume the Socratic constitution interview;
+3. analyze coverage and contradictions;
+4. generate a draft through `speckit-constitution`;
+5. pause for explicit human approval;
+6. finalize and validate only after approval.
 
 ## Phase gates
 
@@ -94,6 +104,8 @@ Do not advance when:
 - tasks do not cover all acceptance criteria;
 - required validation has not run or its failure is unexplained;
 - review findings classified as blocking remain open.
+- a constitution draft is written without approval;
+- a constitution interview has unresolved blocking questions or critical contradictions.
 
 ## Delegation contract
 
