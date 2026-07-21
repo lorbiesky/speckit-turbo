@@ -109,6 +109,10 @@ Do not advance when:
 - a constitution draft is written without approval;
 - a constitution interview has unresolved blocking questions or critical contradictions.
 
+## Evidence contract
+
+Prefer structured evidence with `id`, `type`, `reference`, `status`, `result`, and `recordedAt`. Artifact references must exist; failed, blocked, or skipped evidence cannot satisfy a gate. Text-only evidence is accepted only for legacy state and must be reported as a warning.
+
 ## Delegation contract
 
 For each specialist, provide:

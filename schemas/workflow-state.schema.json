@@ -30,9 +30,30 @@
             "required": ["passed", "evidence"],
             "properties": {
               "passed": { "type": ["boolean", "null"] },
-              "evidence": { "type": "array", "items": { "type": "string" } },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    { "type": "string" },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["id", "type", "reference", "status", "result", "recordedAt"],
+                      "properties": {
+                        "id": { "type": "string", "minLength": 1 },
+                        "type": { "enum": ["artifact", "command", "test", "decision", "text"] },
+                        "reference": { "type": "string" },
+                        "status": { "enum": ["passed", "failed", "blocked", "skipped"] },
+                        "result": { "type": "string", "minLength": 1 },
+                        "recordedAt": { "type": "string", "format": "date-time" }
+                      }
+                    }
+                  ]
+                }
+              },
               "requirements": { "type": "object", "additionalProperties": { "type": "string" } },
-              "reason": { "type": "string" }
+              "reason": { "type": "string" },
+              "legacyEvidence": { "type": "boolean" }
             }
           },
           "checkpoint": {

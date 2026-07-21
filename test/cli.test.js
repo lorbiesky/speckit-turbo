@@ -29,6 +29,7 @@ test("npm CLI initializes an existing project and runs the local Node runtime", 
   const init = command(packageBin, ["init", root, "--mode", "existing"], ROOT, { PATH: "" });
   assert.equal(init.status, 0, init.stderr);
   assert.ok(fs.existsSync(path.join(root, ".specify/turbo/turbo.js")));
+  assert.ok(fs.existsSync(path.join(root, ".specify/turbo/AGENTS.turbo.md")));
   assert.ok(fs.existsSync(path.join(root, ".specify/turbo/node-runtime/node_modules/yaml/package.json")));
   const runtime = command(path.join(root, ".specify/turbo/turbo.js"), ["workflow", "--path", root, "start", "feature", "--work-id", "npm-flow"], root, { PATH: "" });
   assert.equal(runtime.status, 0, runtime.stderr);
@@ -48,6 +49,7 @@ test("npm CLI exposes doctor and version without Python", () => {
   const doctor = command(packageBin, ["doctor", root], ROOT);
   assert.notEqual(doctor.status, 0);
   assert.match(doctor.stdout, /Self-contained Node runtime is installed/);
+  assert.match(doctor.stdout, /Shared Turbo agent rules are installed/);
   const version = command(packageBin, ["version", root], ROOT);
   assert.equal(version.status, 0);
   assert.match(version.stdout, /1\.0\.4/);
@@ -159,4 +161,70 @@ test("public documentation uses agent commands instead of Node workflow scripts"
   for (const shortcut of ["$turbo", "$turbo-feature", "$turbo-bugfix", "$turbo-refactor", "$turbo-discovery", "$turbo-maintenance", "$turbo-hotfix", "$turbo-constitution", "$turbo-status", "$turbo-resume"]) assert.equal(text.includes(shortcut), true, `missing shortcut: ${shortcut}`);
   for (const commandName of ["init", "doctor", "upgrade", "version"]) assert.equal(text.includes(`speckit-turbo@latest ${commandName}`), true, `missing npm command: ${commandName}`);
   assert.equal(text.includes("$speckit-"), true);
+});
+
+test("structured evidence validates artifacts and rejects non-passing results", () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "speckit-turbo-evidence-"));
+  fs.mkdirSync(path.join(root, ".specify/memory"), { recursive: true });
+  fs.writeFileSync(path.join(root, ".specify/memory/constitution.md"), "constitution\n");
+  assert.equal(command(packageBin, ["init", root, "--mode", "existing"], ROOT).status, 0);
+  const runtime = path.join(root, ".specify/turbo/turbo.js");
+  assert.equal(command(runtime, ["workflow", "--path", root, "start", "feature", "--work-id", "evidence-flow"], root).status, 0);
+  const missingArtifact = complete(root, "intake", {
+    classified_as_feature: "artifact|missing-spec.md#AC-001|passed|criterion",
+    scope_recorded: "text|scope recorded",
+    project_profile_loaded: "text|profile loaded",
+  });
+  assert.notEqual(missingArtifact.status, 0);
+  assert.match(missingArtifact.stderr, /missing artifact/);
+  fs.writeFileSync(path.join(root, "spec.md"), "# Specification\n");
+  const failedTest = complete(root, "intake", {
+    classified_as_feature: "artifact|spec.md#AC-001|passed|criterion",
+    scope_recorded: "text|scope recorded",
+    project_profile_loaded: "test|project.yml|failed|profile could not load",
+  });
+  assert.notEqual(failedTest.status, 0);
+  assert.match(failedTest.stderr, /Evidence must pass/);
+  const passed = complete(root, "intake", {
+    classified_as_feature: "artifact|spec.md#AC-001|passed|criterion",
+    scope_recorded: "text|scope recorded",
+    project_profile_loaded: "test|project.yml|passed|profile loaded",
+  });
+  assert.equal(passed.status, 0, passed.stderr);
+  const state = JSON.parse(fs.readFileSync(path.join(root, ".specify/turbo/state.json")));
+  assert.equal(state.phases[0].gate.evidence[0].type, "artifact");
+  assert.equal(state.phases[0].gate.evidence[0].status, "passed");
+  assert.equal(state.phases[0].gate.legacyEvidence, true);
+});
+
+test("all declared workflows can start and complete through the local runtime", () => {
+  const classifications = ["feature", "bugfix", "refactor", "discovery", "maintenance", "hotfix", "constitution"];
+  for (const classification of classifications) {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), `speckit-turbo-${classification}-`));
+    fs.mkdirSync(path.join(root, ".specify/memory"), { recursive: true });
+    fs.writeFileSync(path.join(root, ".specify/memory/constitution.md"), "constitution\n");
+    assert.equal(command(packageBin, ["init", root, "--mode", "existing"], ROOT).status, 0);
+    const profilePath = path.join(root, ".specify/turbo/project.yml");
+    fs.writeFileSync(profilePath, fs.readFileSync(profilePath, "utf8").replace("enabled: true\n  allow_exception", "enabled: false\n  allow_exception"));
+    const runtime = path.join(root, ".specify/turbo/turbo.js");
+    assert.equal(command(runtime, ["workflow", "--path", root, "start", classification, "--work-id", `${classification}-smoke`], root).status, 0);
+    for (let iteration = 0; iteration < 30; iteration += 1) {
+      const statePath = path.join(root, ".specify/turbo/state.json");
+      const state = JSON.parse(fs.readFileSync(statePath));
+      if (state.status === "completed") break;
+      const phase = state.phases.find((item) => item.id === state.currentPhase);
+      assert.ok(phase, `${classification} has no current phase`);
+      if (state.status === "paused") {
+        const approved = command(runtime, ["workflow", "--path", root, "checkpoint", phase.id, "--approve"], root);
+        assert.equal(approved.status, 0, approved.stderr);
+        continue;
+      }
+      assert.equal(phase.status, "active", `${classification} stopped at ${state.currentPhase}`);
+      const evidence = Object.fromEntries(Object.keys(phase.gate.requirements || {}).map((key) => [key, `text|synthetic evidence for ${key}`]));
+      const completed = complete(root, phase.id, evidence);
+      assert.equal(completed.status, 0, `${classification}/${phase.id}: ${completed.stderr}`);
+    }
+    const finalState = JSON.parse(fs.readFileSync(path.join(root, ".specify/turbo/state.json")));
+    assert.equal(finalState.status, "completed", `${classification} did not complete`);
+  }
 });

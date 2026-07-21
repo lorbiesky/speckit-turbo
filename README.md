@@ -205,6 +205,8 @@ turbo-orchestrator
 
 O agente registra cada evidência vinculada a artefatos, comandos, testes ou decisões. Quando uma fase exige aprovação, ele apresenta o contexto e aguarda sua decisão. Use `$turbo-status` para consultar o estado e `$turbo-resume` para retomar um bloqueio ou interrupção.
 
+As evidências novas são estruturadas no `state.json` com `id`, `type`, `reference`, `status`, `result` e `recordedAt`. Artefatos precisam existir; testes e comandos precisam registrar resultado; decisões precisam apontar para uma decisão ou checkpoint persistido. Registros textuais antigos continuam compatíveis, mas o `doctor --strict` os sinaliza como legados e eles não devem ser usados em novos fluxos. O template [`templates/validation-evidence.md`](templates/validation-evidence.md) ajuda o agente a manter a cadeia requisito → aceitação → tarefa → código → teste → revisão.
+
 ## Screenshots e especificações visuais
 
 Ao abrir uma feature com print, anexe a imagem à solicitação do agente:

@@ -10,6 +10,7 @@
     "AGENTS.turbo.md",
     "bin/",
     "manifest.json",
+    "docs/",
     "src/",
     "schemas/",
     "scripts/validate.py",
@@ -19,6 +20,7 @@
   ],
   "scripts": {
     "test": "node --test test/*.test.js",
+    "coverage": "c8 --all --include=src/cli.js --lines=80 --functions=80 --branches=70 --reporter=text --reporter=text-summary node test/coverage-runner.js",
     "validate": "python3 scripts/validate.py"
   },
   "dependencies": {
@@ -40,5 +42,8 @@
     "github-spec-kit",
     "codex",
     "specification-driven-development"
-  ]
+  ],
+  "devDependencies": {
+    "c8": "^12.0.0"
+  }
 }

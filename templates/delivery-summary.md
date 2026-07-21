@@ -40,6 +40,10 @@ Summarize the affected boundaries, contracts, data, and important technical deci
 | Build |  |  |  |
 | Review |  |  |  |
 
+## Structured evidence
+
+For every acceptance criterion and quality gate, record the evidence type, reference, status, result, and timestamp. Use artifact references for files and test or command references for executed validation. Do not convert failed, blocked, or skipped checks into passing evidence.
+
 ## Plan deviations
 
 - None, or describe each deviation and its rationale.

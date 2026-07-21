@@ -15,7 +15,7 @@ const START = "<!-- speckit-turbo:start -->", END = "<!-- speckit-turbo:end -->"
 const IGNORE_START = "# speckit-turbo:start", IGNORE_END = "# speckit-turbo:end", IGNORE_ENTRY = ".specify/visual-references/";
 const SIGNALS = ["memory/constitution.md", "templates", "scripts"];
 const LEGACY_FILES = ["doctor.py", "workflow_runtime.py", "version.py", "upgrade.sh"];
-const REQUIRED_SKILLS = ["turbo", "turbo-status", "turbo-resume", "turbo-orchestrator", "turbo-product-owner", "turbo-architect", "turbo-implementation-specialist", "turbo-test-engineer", "turbo-code-reviewer", "turbo-constitution-facilitator", "turbo-visual-specifier", "turbo-tdd-coach"];
+const REQUIRED_SKILLS = ["turbo", "turbo-feature", "turbo-bugfix", "turbo-refactor", "turbo-discovery", "turbo-maintenance", "turbo-hotfix", "turbo-constitution", "turbo-status", "turbo-resume", "turbo-orchestrator", "turbo-product-owner", "turbo-architect", "turbo-implementation-specialist", "turbo-test-engineer", "turbo-code-reviewer", "turbo-constitution-facilitator", "turbo-visual-specifier", "turbo-tdd-coach"];
 
 const exists = (file) => fs.existsSync(file);
 const read = (file) => fs.readFileSync(file, "utf8");
@@ -119,7 +119,8 @@ function install(args) {
   fs.mkdirSync(path.join(root, ".agents/skills"), { recursive: true });
   for (const skill of fs.readdirSync(path.join(PACKAGE_ROOT, "skills")).filter((name) => name.startsWith("turbo"))) copy(path.join(PACKAGE_ROOT, "skills", skill), path.join(root, ".agents/skills", skill));
   copy(path.join(PACKAGE_ROOT, "schemas"), path.join(turbo, "runtime/schemas")); copy(path.join(PACKAGE_ROOT, "workflows"), path.join(turbo, "runtime/workflows"));
-  fs.mkdirSync(path.join(turbo, "templates"), { recursive: true }); for (const name of ["constitution-interview.md", "constitution.draft.md", "visual-spec.md", "tdd-cycle.md"]) copy(path.join(PACKAGE_ROOT, "templates", name), path.join(turbo, "templates", name));
+  fs.mkdirSync(path.join(turbo, "templates"), { recursive: true }); for (const name of ["constitution-interview.md", "constitution.draft.md", "visual-spec.md", "tdd-cycle.md", "validation-evidence.md"]) copy(path.join(PACKAGE_ROOT, "templates", name), path.join(turbo, "templates", name));
+  copy(path.join(PACKAGE_ROOT, "AGENTS.turbo.md"), path.join(turbo, "AGENTS.turbo.md"));
   copyRuntime(root);
   if (!exists(path.join(turbo, "project.yml"))) copy(path.join(PACKAGE_ROOT, "templates/project.yml"), path.join(turbo, "project.yml"));
   if (!exists(path.join(turbo, "state.json"))) copy(path.join(PACKAGE_ROOT, "templates/state.json"), path.join(turbo, "state.json"));
@@ -143,6 +144,35 @@ function requirements(definition, config, state) {
   if (state.tdd?.exception?.approval === "approved") return result.filter((value) => !["red_test_evidence_recorded", "green_cycle_evidence_recorded", "refactor_evidence_recorded"].includes(value));
   return [...new Set(result)];
 }
+const EVIDENCE_TYPES = new Set(["artifact", "command", "test", "decision", "text"]);
+const EVIDENCE_STATUSES = new Set(["passed", "failed", "blocked", "skipped"]);
+function parseEvidence(id, raw) {
+  const value = String(raw ?? "");
+  if (value.trim().startsWith("{")) {
+    let parsed;
+    try { parsed = JSON.parse(value); } catch (error) { throw new Error(`Evidence '${id}' contains invalid JSON`); }
+    return { id, ...parsed, recordedAt: parsed.recordedAt || now() };
+  }
+  const [type, reference, status, ...result] = value.split("|");
+  if (EVIDENCE_TYPES.has(type) && EVIDENCE_STATUSES.has(status) && result.join("|").trim()) return { id, type, reference: reference || "", status, result: result.join("|"), recordedAt: now() };
+  return { id, type: "text", reference: "", status: "passed", result: value, recordedAt: now() };
+}
+function validateEvidence(root, state, evidence) {
+  if (!evidence || !EVIDENCE_TYPES.has(evidence.type) || !EVIDENCE_STATUSES.has(evidence.status) || !String(evidence.result || "").trim()) throw new Error(`Evidence '${evidence?.id || "unknown"}' must have a valid type, status and result`);
+  if (evidence.type === "artifact") {
+    const relative = String(evidence.reference || "").split("#")[0];
+    const target = path.resolve(root, relative);
+    if (!relative || (!target.startsWith(`${root}${path.sep}`) && target !== root) || !exists(target)) throw new Error(`Evidence '${evidence.id}' references missing artifact '${evidence.reference}'`);
+  }
+  if (evidence.type === "decision") {
+    const reference = String(evidence.reference || "");
+    const decisionFound = (state.decisions || []).some((decision) => decision.id === reference);
+    const checkpointFound = reference.startsWith("phase:") && (state.phases || []).some((phase) => phase.id === reference.slice(6) && ["approved", "rejected"].includes(phase.checkpoint?.status));
+    if (!decisionFound && !checkpointFound) throw new Error(`Evidence '${evidence.id}' references unknown decision or checkpoint '${reference}'`);
+  }
+  return evidence.status === "passed";
+}
+function evidenceRecord(root, state, id, raw) { const evidence = parseEvidence(id, raw); validateEvidence(root, state, evidence); return evidence; }
 function advance(state, flow, config) {
   const defs = new Map(flow.phases.map((phase) => [phase.id, phase])); const done = facts(state, defs); tddState(state, config);
   for (const phase of state.phases) {
@@ -165,7 +195,32 @@ function runtime(args) {
   }
   const state = json(stateFile), flow = workflow(root, state.classification), defs = new Map(flow.phases.map((phase) => [phase.id, phase]),); const config = profile(root); tddState(state, config);
   if (command === "status") { if (has(filtered, "--refresh") && !["completed", "cancelled", "paused"].includes(state.status)) { advance(state, flow, config); writeJson(stateFile, state); } return status(root, state, flow); }
-  if (command === "complete") { const id = filtered[1], phase = phaseById(state, id); if (phase.status !== "active") fail(`Phase '${id}' is ${phase.status}, not active`); const def = defs.get(id), activeRequirements = requirements(def, config, state), evidence = {}; filtered.forEach((value, index) => { if (value === "--evidence") { const [key, ...rest] = (filtered[index + 1] || "").split("="); evidence[key] = rest.join("="); } }); for (const key of Object.keys(evidence)) if (!activeRequirements.includes(key)) fail(`Evidence references undeclared requirement '${key}'`); Object.assign(phase.gate.requirements, evidence); const missing = activeRequirements.filter((key) => !phase.gate.requirements[key]); if (missing.length) fail(`Missing evidence for: ${missing.join(", ")}`); phase.gate.evidence = Object.entries(phase.gate.requirements).map(([key, value]) => `${key}: ${value}`); phase.gate.passed = true; if (id === "visual-analysis") state.visualAnalysis.status = "completed"; if (id === "tdd-preparation") { state.tdd.status = "red_ready"; state.tdd.redEvidence = [phase.gate.requirements.red_test_evidence_recorded]; } if (id === "implementation" && state.tdd.enabled) { state.tdd.status = "completed"; state.tdd.greenEvidence = [phase.gate.requirements.green_cycle_evidence_recorded || "covered by exception"]; state.tdd.refactorEvidence = [phase.gate.requirements.refactor_evidence_recorded || "covered by exception"]; } const checkpoint = def.human_checkpoint === "always" || (def.human_checkpoint === "when_configured" && (config.workflow?.human_checkpoints || []).includes(id)); if (checkpoint) { phase.status = "blocked"; phase.checkpoint = { status: "awaiting_approval", note: "Human approval required by project profile." }; state.status = "paused"; state.nextAction = `Approve or reject the human checkpoint for '${id}'.`; } else { phase.status = "completed"; advance(state, flow, config); } writeJson(stateFile, state); return status(root, state, flow); }
+  if (command === "complete") {
+    const id = filtered[1], phase = phaseById(state, id);
+    if (phase.status !== "active") fail(`Phase '${id}' is ${phase.status}, not active`);
+    const def = defs.get(id), activeRequirements = requirements(def, config, state), evidence = {};
+    filtered.forEach((value, index) => {
+      if (value === "--evidence") {
+        const [key, ...rest] = (filtered[index + 1] || "").split("=");
+        evidence[key] = rest.join("=");
+      }
+    });
+    for (const key of Object.keys(evidence)) if (!activeRequirements.includes(key)) fail(`Evidence references undeclared requirement '${key}'`);
+    Object.assign(phase.gate.requirements, evidence);
+    const records = activeRequirements.map((key) => evidenceRecord(root, state, key, phase.gate.requirements[key]));
+    const missing = records.filter((record) => record.status !== "passed").map((record) => record.id);
+    if (missing.length) fail(`Evidence must pass for: ${missing.join(", ")}`);
+    phase.gate.evidence = records;
+    phase.gate.legacyEvidence = records.some((record) => record.type === "text");
+    phase.gate.passed = true;
+    if (id === "visual-analysis") state.visualAnalysis.status = "completed";
+    if (id === "tdd-preparation") { state.tdd.status = "red_ready"; state.tdd.redEvidence = [phase.gate.requirements.red_test_evidence_recorded]; }
+    if (id === "implementation" && state.tdd.enabled) { state.tdd.status = "completed"; state.tdd.greenEvidence = [phase.gate.requirements.green_cycle_evidence_recorded || "covered by exception"]; state.tdd.refactorEvidence = [phase.gate.requirements.refactor_evidence_recorded || "covered by exception"]; }
+    const checkpoint = def.human_checkpoint === "always" || (def.human_checkpoint === "when_configured" && (config.workflow?.human_checkpoints || []).includes(id));
+    if (checkpoint) { phase.status = "blocked"; phase.checkpoint = { status: "awaiting_approval", note: "Human approval required by project profile." }; state.status = "paused"; state.nextAction = `Approve or reject the human checkpoint for '${id}'.`; }
+    else { phase.status = "completed"; advance(state, flow, config); }
+    writeJson(stateFile, state); return status(root, state, flow);
+  }
   if (command === "exception") { const id = filtered[1], phase = phaseById(state, id); if (id !== "tdd-preparation" || phase.status !== "active") fail("TDD exception must be requested while tdd-preparation is active"); if (config.tdd?.allow_exception !== true) fail("TDD exceptions are disabled by project profile"); const reason = argValue(filtered, "--reason"), risk = argValue(filtered, "--risk"), alternativeValidation = argValue(filtered, "--validation"); if (!reason || !risk || !alternativeValidation) fail("TDD exception requires --reason, --risk and --validation"); state.tdd.exception = { reason, risk, alternativeValidation, approval: "pending" }; state.tdd.status = "exception"; phase.status = "blocked"; phase.checkpoint = { status: "awaiting_approval", note: "TDD exception requires human approval." }; state.status = "paused"; state.currentPhase = id; state.nextAction = "Approve or reject the documented TDD exception."; writeJson(stateFile, state); return status(root, state, flow); }
   if (command === "checkpoint") { const id = filtered[1], phase = phaseById(state, id); if (phase.checkpoint?.status !== "awaiting_approval") fail(`Phase '${id}' is not awaiting a human checkpoint`); const approved = has(filtered, "--approve"), note = argValue(filtered, "--note") || (approved ? "Approved by human." : "Rejected by human."); phase.checkpoint = { status: approved ? "approved" : "rejected", note }; if (approved) { if (state.tdd?.exception && id === "tdd-preparation") state.tdd.exception.approval = "approved"; phase.gate.passed = true; phase.status = "completed"; advance(state, flow, config); } else { if (state.tdd?.exception && id === "tdd-preparation") state.tdd.exception.approval = "rejected"; phase.status = "blocked"; state.status = "blocked"; state.currentPhase = id; state.nextAction = "Address the rejection, then resume."; } writeJson(stateFile, state); return status(root, state, flow); }
   if (command === "resume") { const phase = phaseById(state, state.currentPhase); if (state.status === "blocked") phase.status = "active"; advance(state, flow, config); writeJson(stateFile, state); return status(root, state, flow); }
@@ -175,9 +230,10 @@ function status(root, state, flow) { const phase = phaseById(state, state.curren
 function doctor(args) {
   const root = targetFrom(args), strict = has(args, "--strict"), errors = [], warnings = [], ok = (m) => console.log(`✓ ${m}`), warn = (m) => { warnings.push(m); console.log(`! ${m}`); }, error = (m) => { errors.push(m); console.log(`✗ ${m}`); };
   exists(path.join(root, ".specify")) ? ok("Spec Kit directory detected") : error("Spec Kit directory .specify is missing");
-  const turbo = path.join(root, ".specify/turbo"); exists(path.join(turbo, "turbo.js")) ? ok("Self-contained Node runtime is installed") : error("Node workflow runtime is missing");
-  const names = exists(path.join(root, ".agents/skills")) ? fs.readdirSync(path.join(root, ".agents/skills")) : []; for (const name of REQUIRED_SKILLS) names.includes(name) ? null : error(`Required skill '${name}' is missing`);
-  if (exists(path.join(turbo, "manifest.json"))) ok(`Spec Kit Turbo version ${json(path.join(turbo, "manifest.json")).turboVersion} installed`); else error("Missing Turbo manifest");
+  const turbo = path.join(root, ".specify/turbo"); exists(path.join(turbo, "turbo.js")) ? ok("Self-contained Node runtime is installed") : error("Node workflow runtime is missing"); exists(path.join(turbo, "AGENTS.turbo.md")) ? ok("Shared Turbo agent rules are installed") : error("Shared Turbo agent rules are missing");
+  const installedManifest = exists(path.join(turbo, "manifest.json")) ? json(path.join(turbo, "manifest.json")) : null;
+  const names = exists(path.join(root, ".agents/skills")) ? fs.readdirSync(path.join(root, ".agents/skills")) : []; for (const name of installedManifest?.requiredSkills || REQUIRED_SKILLS) names.includes(name) ? null : error(`Required skill '${name}' is missing`);
+  if (installedManifest) ok(`Spec Kit Turbo version ${installedManifest.turboVersion} installed`); else error("Missing Turbo manifest");
   if (exists(path.join(turbo, "project.yml"))) { const config = profile(root); if (String(config.project?.name || "").startsWith("change-me")) warn("project.yml still contains template placeholders"); if (!config.tdd) warn("project.yml has no tdd configuration; legacy projects keep TDD disabled until explicitly enabled"); if (config.tdd && typeof config.tdd.enabled !== "boolean") error("tdd.enabled must be a boolean"); if (config.tdd?.enabled === true && (!config.commands?.test || String(config.commands.test).includes("replace-with-"))) error("TDD is enabled but commands.test is missing or still a placeholder"); } else error("Missing .specify/turbo/project.yml");
   if (exists(path.join(turbo, "state.json")) && json(path.join(turbo, "state.json")).workId === "replace-with-work-id") warn("state.json still uses the template workId");
   const config = exists(path.join(turbo, "project.yml")) ? profile(root) : {}, visual = config.visual || {}, ignore = exists(path.join(root, ".gitignore")) ? read(path.join(root, ".gitignore")) : "";
@@ -187,6 +243,8 @@ function doctor(args) {
   if (!references.startsWith(`${root}${path.sep}`) && references !== root) error("visual.references_path must remain inside the project");
   if (exists(path.join(root, ".specify/memory/constitution.draft.md"))) warn("Constitution draft is present and must be approved before finalization");
   const state = exists(path.join(turbo, "state.json")) ? json(path.join(turbo, "state.json")) : null;
+  const legacyEvidence = state?.phases?.some((phase) => phase.gate?.legacyEvidence || (phase.gate?.evidence || []).some((item) => typeof item === "string" || item.type === "text"));
+  if (legacyEvidence) warn("Workflow state contains legacy textual evidence; structured evidence is recommended");
   if (state?.tdd?.status === "exception" && state.tdd.exception?.approval !== "approved") error("TDD exception is awaiting human approval");
   if (state?.tdd?.enabled && state.currentPhase === "implementation" && (!state.tdd.redEvidence?.length || !state.tdd.greenEvidence?.length || !state.tdd.refactorEvidence?.length) && state.tdd.exception?.approval !== "approved") error("Implementation is missing TDD red, green or refactor evidence");
   if (state?.tdd?.enabled && ["red_ready", "green", "refactored", "completed", "exception"].includes(state.tdd.status) && !exists(path.join(root, state.tdd.artifactPath || ".specify/turbo/tdd-cycle.md"))) error("TDD state has advanced but tdd-cycle.md is missing");
