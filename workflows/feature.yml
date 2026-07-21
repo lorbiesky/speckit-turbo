@@ -1,0 +1,97 @@
+name: feature
+version: 1
+classification: feature
+state_file: .specify/turbo/state.json
+
+phases:
+  - id: intake
+    owner: turbo-orchestrator
+    outputs:
+      - .specify/turbo/state.json
+    gate:
+      require:
+        - classified_as_feature
+        - scope_recorded
+        - project_profile_loaded
+
+  - id: product-specification
+    owner: turbo-product-owner
+    invokes:
+      - speckit-specify
+      - speckit-clarify
+    outputs:
+      - spec.md
+    gate:
+      require:
+        - problem_and_outcome_defined
+        - testable_acceptance_criteria
+        - blocking_questions_resolved
+        - out_of_scope_declared
+      human_checkpoint: when_configured
+
+  - id: technical-plan
+    owner: turbo-architect
+    invokes:
+      - speckit-plan
+    outputs:
+      - plan.md
+      - research.md
+      - data-model.md
+      - contracts/
+    gate:
+      require:
+        - repository_evidence_cited
+        - architecture_and_boundaries_defined
+        - risks_and_mitigations_recorded
+        - test_strategy_defined
+      human_checkpoint: when_configured
+
+  - id: task-decomposition
+    owner: turbo-orchestrator
+    invokes:
+      - speckit-tasks
+      - speckit-analyze
+    outputs:
+      - tasks.md
+    gate:
+      require:
+        - every_acceptance_criterion_covered
+        - dependencies_explicit
+        - parallel_work_marked
+        - no_unresolved_spec_plan_conflicts
+
+  - id: implementation
+    owner: stack-specialist
+    invokes:
+      - speckit-implement
+    gate:
+      require:
+        - implementation_matches_tasks
+        - deviations_recorded
+        - repository_rules_followed
+
+  - id: validation
+    owner: turbo-test-engineer
+    gate:
+      require:
+        - configured_quality_gates_executed
+        - acceptance_criteria_have_evidence
+        - failures_explained_or_resolved
+
+  - id: review
+    owner: turbo-code-reviewer
+    gate:
+      require:
+        - specification_compliance_reviewed
+        - regression_risk_reviewed
+        - blocking_findings_resolved
+
+  - id: delivery
+    owner: turbo-orchestrator
+    outputs:
+      - delivery-summary.md
+    gate:
+      require:
+        - state_completed
+        - validations_summarized
+        - risks_and_followups_recorded

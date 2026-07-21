@@ -1,0 +1,85 @@
+name: refactor
+version: 1
+classification: refactor
+state_file: .specify/turbo/state.json
+
+phases:
+  - id: intake
+    owner: turbo-orchestrator
+    gate:
+      require:
+        - motivation_recorded
+        - behavioral_invariants_declared
+        - project_profile_loaded
+
+  - id: architecture-analysis
+    owner: turbo-architect
+    outputs:
+      - refactor-analysis.md
+    gate:
+      require:
+        - current_structure_evidenced
+        - target_boundaries_defined
+        - migration_risks_recorded
+        - behavior_change_excluded_or_reclassified
+
+  - id: regression-baseline
+    owner: turbo-test-engineer
+    gate:
+      require:
+        - critical_invariants_have_coverage
+        - missing_coverage_risk_recorded
+        - baseline_validation_executed
+
+  - id: transformation-plan
+    owner: turbo-architect
+    invokes:
+      - speckit-plan
+      - speckit-tasks
+      - speckit-analyze
+    outputs:
+      - plan.md
+      - tasks.md
+    gate:
+      require:
+        - incremental_steps_defined
+        - intermediate_states_buildable
+        - rollback_points_identified
+        - task_order_and_dependencies_explicit
+
+  - id: implementation
+    owner: stack-specialist
+    invokes:
+      - speckit-implement
+    gate:
+      require:
+        - invariants_preserved_per_increment
+        - unrelated_cleanup_excluded
+        - deviations_recorded
+
+  - id: validation
+    owner: turbo-test-engineer
+    gate:
+      require:
+        - baseline_and_final_results_compared
+        - configured_quality_gates_executed
+        - performance_or_bundle_impact_checked_when_relevant
+
+  - id: review
+    owner: turbo-code-reviewer
+    gate:
+      require:
+        - structural_goal_achieved
+        - behavior_preservation_reviewed
+        - complexity_not_displaced
+        - blocking_findings_resolved
+
+  - id: delivery
+    owner: turbo-orchestrator
+    outputs:
+      - delivery-summary.md
+    gate:
+      require:
+        - before_after_summary_recorded
+        - validation_evidence_recorded
+        - deferred_cleanup_recorded

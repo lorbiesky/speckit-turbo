@@ -1,0 +1,83 @@
+name: bugfix
+version: 1
+classification: bugfix
+state_file: .specify/turbo/state.json
+
+phases:
+  - id: intake
+    owner: turbo-orchestrator
+    gate:
+      require:
+        - observable_failure_recorded
+        - impact_and_urgency_recorded
+        - project_profile_loaded
+
+  - id: reproduction
+    owner: implementation-specialist
+    outputs:
+      - bug-evidence.md
+    gate:
+      require:
+        - reproduction_steps_or_reason_unavailable
+        - expected_and_actual_behavior
+        - affected_versions_or_context
+
+  - id: root-cause
+    owner: turbo-architect
+    outputs:
+      - root-cause.md
+    gate:
+      require:
+        - evidence_based_cause
+        - affected_boundary_identified
+        - competing_hypotheses_addressed
+
+  - id: correction-plan
+    owner: turbo-architect
+    invokes:
+      - speckit-plan
+    outputs:
+      - plan.md
+    gate:
+      require:
+        - smallest_safe_change_defined
+        - regression_test_defined
+        - rollback_or_recovery_considered
+
+  - id: implementation
+    owner: stack-specialist
+    invokes:
+      - speckit-tasks
+      - speckit-implement
+    gate:
+      require:
+        - root_cause_addressed
+        - unrelated_changes_excluded
+        - regression_coverage_added
+
+  - id: validation
+    owner: turbo-test-engineer
+    gate:
+      require:
+        - original_failure_no_longer_reproduces
+        - regression_test_passes
+        - surrounding_behavior_checked
+        - configured_quality_gates_executed
+
+  - id: review
+    owner: turbo-code-reviewer
+    gate:
+      require:
+        - fix_matches_root_cause
+        - regression_risk_reviewed
+        - blocking_findings_resolved
+
+  - id: delivery
+    owner: turbo-orchestrator
+    outputs:
+      - delivery-summary.md
+    gate:
+      require:
+        - root_cause_and_fix_summarized
+        - validation_evidence_recorded
+        - followups_recorded
