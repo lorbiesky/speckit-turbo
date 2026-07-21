@@ -328,6 +328,9 @@ def main() -> int:
     for command in ("init", "doctor", "upgrade", "version"):
         if f"speckit-turbo@latest {command}" not in public_text:
             fail(f"documentation: missing npm command 'speckit-turbo@latest {command}'")
+    for install_example in ("init . --mode existing", "init ./"):
+        if install_example not in public_text:
+            fail(f"documentation: missing target-directory example '{install_example}'")
     if "$speckit-" not in public_text:
         fail("documentation: upstream $speckit-* commands are not preserved")
 
