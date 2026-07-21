@@ -1,0 +1,4 @@
+interface:
+  display_name: "Turbo Refactor"
+  short_description: "Inicie um refactor com invariantes"
+  default_prompt: "Use $turbo-refactor para conduzir este refactor."

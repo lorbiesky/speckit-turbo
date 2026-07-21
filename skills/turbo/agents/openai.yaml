@@ -1,0 +1,4 @@
+interface:
+  display_name: "Turbo"
+  short_description: "Inicie ou retome um fluxo Turbo"
+  default_prompt: "Use $turbo para conduzir este pedido."

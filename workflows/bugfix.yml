@@ -6,16 +6,23 @@ state_file: .specify/turbo/state.json
 phases:
   - id: intake
     owner: turbo-orchestrator
+    provides:
+      - project_profile_loaded
+      - bugfix_intake_complete
     gate:
       require:
         - observable_failure_recorded
         - impact_and_urgency_recorded
         - project_profile_loaded
+    on_blocked: pause_and_record
 
   - id: reproduction
-    owner: implementation-specialist
+    owner: turbo-implementation-specialist
+    provides:
+      - reproduction_complete
     outputs:
       - bug-evidence.md
+    on_blocked: pause_and_record
     gate:
       require:
         - reproduction_steps_or_reason_unavailable
@@ -24,8 +31,11 @@ phases:
 
   - id: root-cause
     owner: turbo-architect
+    provides:
+      - root_cause_complete
     outputs:
       - root-cause.md
+    on_blocked: pause_and_record
     gate:
       require:
         - evidence_based_cause
@@ -34,10 +44,13 @@ phases:
 
   - id: correction-plan
     owner: turbo-architect
+    provides:
+      - correction_plan_ready
     invokes:
       - speckit-plan
     outputs:
       - plan.md
+    on_blocked: pause_and_record
     gate:
       require:
         - smallest_safe_change_defined
@@ -45,10 +58,16 @@ phases:
         - rollback_or_recovery_considered
 
   - id: implementation
-    owner: stack-specialist
+    owner: turbo-implementation-specialist
+    provides:
+      - implementation_ready
+    preconditions:
+      - root_cause_complete
+      - correction_plan_ready
     invokes:
       - speckit-tasks
       - speckit-implement
+    on_blocked: pause_and_record
     gate:
       require:
         - root_cause_addressed
@@ -57,6 +76,11 @@ phases:
 
   - id: validation
     owner: turbo-test-engineer
+    provides:
+      - validation_ready
+    preconditions:
+      - implementation_ready
+    on_blocked: pause_and_record
     gate:
       require:
         - original_failure_no_longer_reproduces
@@ -66,6 +90,11 @@ phases:
 
   - id: review
     owner: turbo-code-reviewer
+    provides:
+      - review_ready
+    preconditions:
+      - validation_ready
+    on_blocked: pause_and_record
     gate:
       require:
         - fix_matches_root_cause
@@ -74,6 +103,8 @@ phases:
 
   - id: delivery
     owner: turbo-orchestrator
+    preconditions:
+      - review_ready
     outputs:
       - delivery-summary.md
     gate:
@@ -81,3 +112,4 @@ phases:
         - root_cause_and_fix_summarized
         - validation_evidence_recorded
         - followups_recorded
+    on_blocked: pause_and_record

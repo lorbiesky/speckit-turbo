@@ -1,0 +1,4 @@
+interface:
+  display_name: "Turbo Discovery"
+  short_description: "Inicie uma descoberta técnica orientada"
+  default_prompt: "Use $turbo-discovery para investigar esta decisão."

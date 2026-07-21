@@ -1,0 +1,4 @@
+interface:
+  display_name: "Turbo Bugfix"
+  short_description: "Inicie um bugfix com evidências"
+  default_prompt: "Use $turbo-bugfix para corrigir este problema."

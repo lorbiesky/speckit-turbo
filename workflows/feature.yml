@@ -6,21 +6,51 @@ state_file: .specify/turbo/state.json
 phases:
   - id: intake
     owner: turbo-orchestrator
+    provides:
+      - project_profile_loaded
+      - classified_as_feature
+      - scope_recorded
     outputs:
       - .specify/turbo/state.json
+    on_blocked: pause_and_record
     gate:
       require:
         - classified_as_feature
         - scope_recorded
         - project_profile_loaded
 
+  - id: visual-analysis
+    owner: turbo-visual-specifier
+    provides:
+      - visual_analysis_completed
+    outputs:
+      - visual-spec.md
+      - .specify/turbo/state.json
+    condition: visual_input_present
+    gate:
+      require:
+        - images_identified
+        - visual_evidence_classified
+        - component_inventory_recorded
+        - visual_acceptance_criteria_generated
+        - persistence_protection_verified_or_not_required
+    human_checkpoint: when_configured
+    on_blocked: pause_and_record
+
   - id: product-specification
     owner: turbo-product-owner
+    provides:
+      - product_specification_ready
     invokes:
       - speckit-specify
       - speckit-clarify
     outputs:
+      - clarifications.md
       - spec.md
+    condition: visual_input_absent_or_completed
+    preconditions:
+      - project_profile_loaded
+    on_blocked: pause_and_record
     gate:
       require:
         - problem_and_outcome_defined
@@ -31,6 +61,8 @@ phases:
 
   - id: technical-plan
     owner: turbo-architect
+    provides:
+      - technical_plan_ready
     invokes:
       - speckit-plan
     outputs:
@@ -38,6 +70,9 @@ phases:
       - research.md
       - data-model.md
       - contracts/
+    preconditions:
+      - product_specification_ready
+    on_blocked: pause_and_record
     gate:
       require:
         - repository_evidence_cited
@@ -48,11 +83,16 @@ phases:
 
   - id: task-decomposition
     owner: turbo-orchestrator
+    provides:
+      - tasks_ready
     invokes:
       - speckit-tasks
       - speckit-analyze
     outputs:
       - tasks.md
+    preconditions:
+      - technical_plan_ready
+    on_blocked: pause_and_record
     gate:
       require:
         - every_acceptance_criterion_covered
@@ -61,9 +101,14 @@ phases:
         - no_unresolved_spec_plan_conflicts
 
   - id: implementation
-    owner: stack-specialist
+    owner: turbo-implementation-specialist
+    provides:
+      - implementation_ready
     invokes:
       - speckit-implement
+    preconditions:
+      - tasks_ready
+    on_blocked: pause_and_record
     gate:
       require:
         - implementation_matches_tasks
@@ -72,6 +117,11 @@ phases:
 
   - id: validation
     owner: turbo-test-engineer
+    provides:
+      - validation_ready
+    preconditions:
+      - implementation_ready
+    on_blocked: pause_and_record
     gate:
       require:
         - configured_quality_gates_executed
@@ -80,6 +130,11 @@ phases:
 
   - id: review
     owner: turbo-code-reviewer
+    provides:
+      - review_ready
+    preconditions:
+      - validation_ready
+    on_blocked: pause_and_record
     gate:
       require:
         - specification_compliance_reviewed
@@ -88,6 +143,8 @@ phases:
 
   - id: delivery
     owner: turbo-orchestrator
+    preconditions:
+      - review_ready
     outputs:
       - delivery-summary.md
     gate:
@@ -95,3 +152,4 @@ phases:
         - state_completed
         - validations_summarized
         - risks_and_followups_recorded
+    on_blocked: pause_and_record

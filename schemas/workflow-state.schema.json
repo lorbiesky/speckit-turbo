@@ -4,11 +4,11 @@
   "title": "Spec Kit Turbo Workflow State",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "workId", "classification", "workflow", "status", "currentPhase", "phases", "decisions", "openQuestions", "validations", "nextAction", "updatedAt"],
+  "required": ["version", "workId", "classification", "workflow", "status", "currentPhase", "phases", "decisions", "openQuestions", "validations", "deviations", "nextAction", "updatedAt"],
   "properties": {
     "version": { "type": "string", "const": "1.0" },
     "workId": { "type": "string", "minLength": 1 },
-    "classification": { "type": "string", "enum": ["feature", "bugfix", "refactor", "discovery", "maintenance", "hotfix"] },
+    "classification": { "type": "string", "enum": ["feature", "bugfix", "refactor", "discovery", "maintenance", "hotfix", "constitution"] },
     "workflow": { "type": "string", "minLength": 1 },
     "status": { "type": "string", "enum": ["draft", "active", "blocked", "paused", "completed", "cancelled"] },
     "currentPhase": { "type": "string", "minLength": 1 },
@@ -31,7 +31,17 @@
             "properties": {
               "passed": { "type": ["boolean", "null"] },
               "evidence": { "type": "array", "items": { "type": "string" } },
+              "requirements": { "type": "object", "additionalProperties": { "type": "string" } },
               "reason": { "type": "string" }
+            }
+          },
+          "checkpoint": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["status", "note"],
+            "properties": {
+              "status": { "enum": ["awaiting_approval", "approved", "rejected"] },
+              "note": { "type": "string" }
             }
           }
         }
@@ -79,6 +89,49 @@
           "status": { "type": "string", "enum": ["pending", "passed", "failed", "skipped"] },
           "evidence": { "type": "string" }
         }
+      }
+    },
+    "deviations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "summary", "status"],
+        "properties": {
+          "id": { "type": "string" },
+          "summary": { "type": "string" },
+          "status": { "enum": ["proposed", "accepted", "rejected"] },
+          "impact": { "type": "string" },
+          "decidedBy": { "type": "string" }
+        }
+      }
+    },
+    "constitutionInterview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "status", "currentTheme", "currentQuestion", "draftPath", "interviewPath", "confidence"],
+      "properties": {
+        "mode": { "enum": ["create", "update"] },
+        "status": { "enum": ["not_started", "active", "draft_ready", "awaiting_approval", "approved", "rejected", "blocked", "completed"] },
+        "currentTheme": { "type": "string" },
+        "currentQuestion": { "type": "string" },
+        "draftPath": { "type": "string" },
+        "interviewPath": { "type": "string" },
+        "confidence": { "enum": ["high", "medium", "low"] }
+      }
+    },
+    "visualAnalysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "inputs", "visualSpecPath", "persistedReferencesPath", "confidence", "unresolvedQuestions", "acceptanceCriteria"],
+      "properties": {
+        "status": { "enum": ["not_started", "skipped", "active", "completed", "blocked"] },
+        "inputs": { "type": "array", "items": { "type": "string" } },
+        "visualSpecPath": { "type": "string" },
+        "persistedReferencesPath": { "type": "string" },
+        "confidence": { "enum": ["high", "medium", "low"] },
+        "unresolvedQuestions": { "type": "array", "items": { "type": "string" } },
+        "acceptanceCriteria": { "type": "array", "items": { "type": "string", "pattern": "^VAC-[0-9]+$" } }
       }
     },
     "nextAction": { "type": "string", "minLength": 1 },

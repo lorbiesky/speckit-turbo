@@ -39,6 +39,10 @@ Encapsulate specialist behavior. Initial roles:
 - code reviewer;
 - release manager.
 
+The v1 implementation is Codex-first and installs skills under `.agents/skills`. The generic implementation specialist executes approved tasks; technology-specific specialists can be added later without changing workflow contracts.
+
+The constitution facilitator diagnoses the repository, conducts one adaptive question at a time, delegates draft writing to `speckit-constitution`, and requires human approval before finalizing `.specify/memory/constitution.md`.
+
 Skills should define inputs, outputs, boundaries, handoff rules, and stop conditions. They should not duplicate generic repository context already present in `AGENTS.md`.
 
 ### 5. Stack profiles
@@ -69,7 +73,23 @@ request
 
 ## State and resumability
 
-Every workflow should make its current phase, completed artifacts, open questions, decisions, and next action recoverable from repository files. Chat history must not be the only source of truth.
+Every workflow should make its current phase, completed artifacts, open questions, decisions, deviations, validations, blockers, and next action recoverable from repository files. Chat history must not be the only source of truth.
+
+## Installation contract
+
+The project-local manifest fixes the Turbo version and identifies managed assets. Install and upgrade refresh managed runtime files while preserving project configuration and Spec Kit artifacts. Shared Turbo rules live in `AGENTS.turbo.md`; repository-specific rules remain in the consumer's `AGENTS.md`.
+
+## State runtime
+
+`.specify/turbo/turbo.js` is the self-contained Node runtime between declarative workflow YAML and agent work. It creates the phase list for the selected classification, evaluates conditions and earlier-phase preconditions, skips inapplicable phases, verifies one evidence entry for each gate requirement, and records human approval or rejection. Skills still perform discovery, implementation, testing, and review; the runtime only makes their handoffs and resumptions unambiguous.
+
+## Socratic constitution flow
+
+The constitution workflow persists diagnosis, questions, answers, decisions, contradictions, confidence, draft path, and approval status. A draft is written to `.specify/memory/constitution.draft.md`; the final constitution changes only after approval. Interrupted interviews resume from `.specify/turbo/state.json`.
+
+## Visual specification flow
+
+When a frontend request includes screenshots, the visual specifier runs before product specification. It records observed, inferred, and unknown visual facts, generates `VAC-*` criteria, and references the result from `spec.md`. Image persistence is opt-in and can occur only under `.specify/visual-references/` after the managed `.gitignore` rule passes `git check-ignore`.
 
 ## Quality model
 

@@ -3,11 +3,36 @@ project:
   type: other
   stack: generic
 
+specKit:
+  version: replace-with-spec-kit-version
+  integration: codex
+
+constitution:
+  enabled: true
+  require_human_approval: true
+  themes:
+    - engineering_principles
+    - quality_testing
+    - architecture
+    - security_privacy
+    - documentation
+    - collaboration
+    - governance
+
+visual:
+  enabled: true
+  persist_references: false
+  references_path: .specify/visual-references
+  require_visual_acceptance: true
+  visual_regression: false
+
 workflow:
   require_clarification: true
   require_plan_approval: true
   require_tests: true
   require_final_review: true
+  # Phases that require explicit approval. Empty keeps autonomous progress between mandatory gates.
+  human_checkpoints: []
 
 quality:
   lint: true
