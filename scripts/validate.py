@@ -99,6 +99,7 @@ def main() -> int:
         "bug-evidence.md",
         "root-cause.md",
         "refactor-analysis.md",
+        "tdd-cycle.md",
     }
     existing_templates = {
         path.name for path in (ROOT / "templates").iterdir() if path.is_file()
@@ -154,7 +155,7 @@ def main() -> int:
     )
     workflow_classifications: dict[str, Path] = {}
     workflow_count = 0
-    supported_conditions = {"visual_input_present", "visual_input_absent_or_completed"}
+    supported_conditions = {"visual_input_present", "visual_input_absent_or_completed", "tdd_enabled"}
     supported_checkpoints = {"always", "when_configured"}
 
     for path in sorted((ROOT / "workflows").glob("*.yml")):
@@ -190,6 +191,8 @@ def main() -> int:
 
         phase_ids: set[str] = set()
         provided_facts: set[str] = set()
+        implementation_phase_seen = False
+        tdd_phase_seen = False
         for index, phase in enumerate(phases):
             label = f"{path.relative_to(ROOT)}: phases[{index}]"
             if not isinstance(phase, dict):
@@ -203,6 +206,16 @@ def main() -> int:
                 fail(f"{label}: duplicate phase id '{phase_id}'")
             else:
                 phase_ids.add(phase_id)
+            if phase_id in {"implementation", "correction"}:
+                implementation_phase_seen = True
+            if phase_id == "tdd-preparation":
+                tdd_phase_seen = True
+                if phase.get("condition") != "tdd_enabled":
+                    fail(f"{label}: tdd-preparation must use condition 'tdd_enabled'")
+                if phase.get("owner") != "turbo-tdd-coach":
+                    fail(f"{label}: tdd-preparation must be owned by turbo-tdd-coach")
+                if phase.get("satisfies_on_skip") is not True:
+                    fail(f"{label}: tdd-preparation must satisfy its provided facts when skipped")
 
             owner = phase.get("owner")
             if not isinstance(owner, str) or not owner:
@@ -216,6 +229,15 @@ def main() -> int:
                 fail(f"{label}: gate.require must be a non-empty list")
             elif len(requirements) != len(set(requirements)):
                 fail(f"{label}: gate.require contains duplicates")
+            require_when = gate.get("require_when", {}) if isinstance(gate, dict) else {}
+            if not isinstance(require_when, dict):
+                fail(f"{label}: gate.require_when must be an object")
+            else:
+                for condition, conditional_requirements in require_when.items():
+                    if condition not in supported_conditions:
+                        fail(f"{label}: unsupported gate condition '{condition}'")
+                    if not isinstance(conditional_requirements, list) or not conditional_requirements or not all(isinstance(item, str) and item for item in conditional_requirements):
+                        fail(f"{label}: gate.require_when.{condition} must be a non-empty list of facts")
 
             outputs = phase.get("outputs", [])
             if outputs is not None and (not isinstance(outputs, list) or not all(isinstance(item, str) and item for item in outputs)):
@@ -261,11 +283,53 @@ def main() -> int:
                     }:
                         fail(f"{label}: unsupported Spec Kit command '{invoked}'")
 
+        if classification in {"feature", "bugfix", "refactor", "maintenance", "hotfix"} and implementation_phase_seen and not tdd_phase_seen:
+            fail(f"{path.relative_to(ROOT)}: implementation workflows must declare tdd-preparation")
+
     if workflow_count == 0:
         fail("workflows/: no workflows found")
     missing_workflows = allowed_classifications - set(workflow_classifications)
     if missing_workflows:
         fail("workflows/: classifications without a workflow: " + ", ".join(sorted(missing_workflows)))
+
+    public_docs = [ROOT / "README.md", ROOT / "AGENTS.turbo.md"]
+    public_docs.extend(sorted((ROOT / "docs").glob("*.md")))
+    public_docs.extend(sorted((ROOT / "skills").glob("*/SKILL.md")))
+    forbidden_public_patterns = {
+        "node .specify/turbo/turbo.js": "manual Node runtime command",
+        "workflow --path": "manual workflow runtime command",
+        "--visual-input": "manual screenshot runtime argument",
+    }
+    for path in public_docs:
+        text = path.read_text(encoding="utf-8")
+        for pattern, description in forbidden_public_patterns.items():
+            if pattern in text:
+                fail(f"{path.relative_to(ROOT)}: public documentation contains {description} '{pattern}'")
+
+    documented_shortcuts = {
+        "$turbo": "turbo",
+        "$turbo-status": "turbo-status",
+        "$turbo-resume": "turbo-resume",
+        "$turbo-feature": "turbo-feature",
+        "$turbo-bugfix": "turbo-bugfix",
+        "$turbo-refactor": "turbo-refactor",
+        "$turbo-discovery": "turbo-discovery",
+        "$turbo-maintenance": "turbo-maintenance",
+        "$turbo-hotfix": "turbo-hotfix",
+        "$turbo-constitution": "turbo-constitution",
+    }
+    public_text = "\n".join(path.read_text(encoding="utf-8") for path in public_docs)
+    for shortcut, skill_name in documented_shortcuts.items():
+        if shortcut not in public_text:
+            fail(f"documentation: missing agent shortcut '{shortcut}'")
+        if skill_name not in skills:
+            fail(f"documentation: shortcut '{shortcut}' references missing skill '{skill_name}'")
+
+    for command in ("init", "doctor", "upgrade", "version"):
+        if f"speckit-turbo@latest {command}" not in public_text:
+            fail(f"documentation: missing npm command 'speckit-turbo@latest {command}'")
+    if "$speckit-" not in public_text:
+        fail("documentation: upstream $speckit-* commands are not preserved")
 
     if ERRORS:
         print(f"Validation failed with {len(ERRORS)} error(s):", file=sys.stderr)

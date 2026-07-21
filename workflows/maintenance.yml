@@ -21,13 +21,26 @@ phases:
       require: [safe_change_plan_defined, validation_strategy_defined, rollback_considered]
     on_blocked: pause_and_record
 
+  - id: tdd-preparation
+    owner: turbo-tdd-coach
+    provides: [tdd_cycle_ready]
+    satisfies_on_skip: true
+    condition: tdd_enabled
+    preconditions: [maintenance_plan_ready]
+    outputs: [.specify/turbo/tdd-cycle.md, .specify/turbo/state.json]
+    gate:
+      require: [test_strategy_defined, red_test_evidence_recorded]
+    on_blocked: pause_and_record
+
   - id: implementation
     owner: turbo-implementation-specialist
     provides: [implementation_ready]
-    preconditions: [maintenance_plan_ready]
     invokes: [speckit-implement]
+    preconditions: [maintenance_plan_ready, tdd_cycle_ready]
     gate:
       require: [planned_maintenance_completed, unrelated_changes_excluded, deviations_recorded]
+      require_when:
+        tdd_enabled: [green_cycle_evidence_recorded, refactor_evidence_recorded]
     on_blocked: pause_and_record
 
   - id: validation

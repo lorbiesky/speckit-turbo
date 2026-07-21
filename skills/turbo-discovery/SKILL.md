@@ -5,4 +5,4 @@ description: Start the Spec Kit Turbo discovery workflow to investigate a bounde
 
 # Turbo Discovery
 
-Start `discovery` with the local runtime. Define the decision this research supports, cite evidence, compare alternatives, and deliver a recommendation with confidence and risks. Stop before implementation unless the user explicitly authorizes a new workflow.
+Start the `discovery` workflow through the agent orchestration contract. Define the decision this research supports, cite evidence, compare alternatives, and deliver a recommendation with confidence and risks. Stop before implementation unless the user explicitly authorizes a new workflow.

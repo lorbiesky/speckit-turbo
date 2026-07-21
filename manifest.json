@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "turboVersion": "1.0.2",
+  "turboVersion": "1.0.3",
   "source": "https://github.com/lorbiesky/speckit-turbo",
   "specKit": {
     "integration": "codex",
@@ -15,6 +15,7 @@
     ".specify/turbo/runtime/schemas",
     ".specify/turbo/runtime/workflows",
     ".specify/turbo/templates/constitution-*",
+    ".specify/turbo/templates/tdd-cycle.md",
     ".specify/turbo/templates/visual-spec.md",
     ".specify/turbo/project.yml",
     ".specify/turbo/state.json"

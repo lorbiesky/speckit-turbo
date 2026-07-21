@@ -20,13 +20,26 @@ phases:
       require: [observable_failure_or_risk_recorded, containment_or_reason_recorded, rollback_path_known]
     on_blocked: pause_and_record
 
+  - id: tdd-preparation
+    owner: turbo-tdd-coach
+    provides: [tdd_cycle_ready]
+    satisfies_on_skip: true
+    condition: tdd_enabled
+    preconditions: [containment_complete]
+    outputs: [.specify/turbo/tdd-cycle.md, .specify/turbo/state.json]
+    gate:
+      require: [test_strategy_defined, red_test_evidence_recorded]
+    on_blocked: pause_and_record
+
   - id: correction
     owner: turbo-implementation-specialist
     provides: [implementation_ready]
-    preconditions: [containment_complete]
     invokes: [speckit-implement]
+    preconditions: [containment_complete, tdd_cycle_ready]
     gate:
       require: [smallest_safe_fix_applied, root_cause_hypothesis_recorded, unrelated_changes_excluded]
+      require_when:
+        tdd_enabled: [green_cycle_evidence_recorded, refactor_evidence_recorded]
     on_blocked: pause_and_record
 
   - id: validation

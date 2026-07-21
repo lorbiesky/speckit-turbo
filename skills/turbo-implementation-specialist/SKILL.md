@@ -29,10 +29,12 @@ Execute the approved `tasks.md` using the project's existing conventions and the
 
 1. Confirm the task list, scope, dependencies, and current phase before editing.
 2. Inspect the affected code and follow existing patterns.
-3. Implement the smallest coherent slice, including its tests where specified.
-4. Run targeted checks after each meaningful slice.
-5. Keep unrelated cleanup out of the change.
-6. Record any necessary deviation before continuing.
+3. When `tdd.enabled` is true, confirm the red-test handoff before writing production code.
+4. Implement the smallest coherent slice and reach green.
+5. Refactor without changing behavior and record green/refactor evidence.
+6. Run targeted checks after each meaningful slice.
+7. Keep unrelated cleanup out of the change.
+8. Record any necessary deviation before continuing.
 
 ## Boundaries and stop conditions
 

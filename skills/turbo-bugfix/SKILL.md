@@ -5,4 +5,4 @@ description: Start the Spec Kit Turbo bugfix workflow for an observable defect r
 
 # Turbo Bugfix
 
-Start `bugfix` with the local runtime and a concise work id. Require observable failure evidence or a documented reason it cannot be reproduced. Follow the workflow through root cause, regression coverage, validation, and review; do not broaden scope without recording it.
+Start the `bugfix` workflow through the agent orchestration contract. Require observable failure evidence or a documented reason it cannot be reproduced. Follow the workflow through root cause, regression coverage, validation, and review; do not broaden scope without recording it.

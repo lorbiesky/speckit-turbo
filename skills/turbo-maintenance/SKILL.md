@@ -5,4 +5,4 @@ description: Start the Spec Kit Turbo maintenance workflow for planned dependenc
 
 # Turbo Maintenance
 
-Start `maintenance` with the local runtime. Define operational impact and rollback before implementation, then complete the plan, validation, review, and delivery gates.
+Start the `maintenance` workflow through the agent orchestration contract. Define operational impact and rollback before implementation, then complete the plan, validation, review, and delivery gates.

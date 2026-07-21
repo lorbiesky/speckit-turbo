@@ -5,4 +5,4 @@ description: Resume a blocked or interrupted Spec Kit Turbo workflow after check
 
 # Turbo Resume
 
-Read state, blocker, unresolved questions, and checkpoint decision. Resolve only the documented blocker, then run `node .specify/turbo/turbo.js workflow --path . resume`. Report the newly active phase and owner; do not silently discard rejected checkpoint evidence.
+Read state, blocker, unresolved questions, and checkpoint decision. Resolve only the documented blocker through the responsible skill, then resume the workflow through the internal orchestrator. Report the newly active phase and owner; do not silently discard rejected checkpoint evidence.
