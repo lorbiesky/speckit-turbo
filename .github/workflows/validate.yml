@@ -30,6 +30,9 @@ jobs:
       - name: Run npm tests
         run: npm test
 
+      - name: Run Node coverage gates
+        run: npm run coverage
+
       - name: Check npm package contents
         run: npm pack --dry-run
 

@@ -100,6 +100,7 @@ def main() -> int:
         "root-cause.md",
         "refactor-analysis.md",
         "tdd-cycle.md",
+        "validation-evidence.md",
     }
     existing_templates = {
         path.name for path in (ROOT / "templates").iterdir() if path.is_file()
@@ -146,6 +147,22 @@ def main() -> int:
 
     if "turbo-orchestrator" not in skills:
         fail("skills/: turbo-orchestrator is required")
+    required_skills = {
+        "turbo", "turbo-feature", "turbo-bugfix", "turbo-refactor", "turbo-discovery",
+        "turbo-maintenance", "turbo-hotfix", "turbo-constitution", "turbo-status", "turbo-resume",
+        "turbo-orchestrator", "turbo-product-owner", "turbo-architect", "turbo-implementation-specialist",
+        "turbo-test-engineer", "turbo-code-reviewer", "turbo-constitution-facilitator",
+        "turbo-visual-specifier", "turbo-tdd-coach",
+    }
+    for missing_skill in sorted(required_skills - set(skills)):
+        fail(f"skills/: required skill '{missing_skill}' is missing")
+    if isinstance(manifest, dict):
+        declared_skills = set(manifest.get("requiredSkills", []))
+        if declared_skills != set(skills):
+            fail(
+                "manifest.json: requiredSkills must match the skills shipped by the package "
+                f"(declared={sorted(declared_skills)}, actual={sorted(skills)})"
+            )
 
     allowed_classifications = set(
         schemas.get("workflow-state.schema.json", {})

@@ -82,6 +82,8 @@ Provide evidence for the classification. Do not weaken or remove a test merely t
 
 When TDD is enabled, validate the red, green and refactor evidence recorded in `tdd-cycle.md`. A passing test without preceding red evidence is insufficient.
 
+Record each validation as structured evidence whenever possible: identify the acceptance criterion, use `type: test` or `type: command`, include the reference, status, result, and timestamp. A failed, blocked, or skipped check must remain visible and cannot be used to pass a gate.
+
 The validation phase cannot pass when:
 
 - a required acceptance criterion lacks evidence;

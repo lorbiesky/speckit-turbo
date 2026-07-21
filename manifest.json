@@ -1,6 +1,13 @@
 {
   "manifestVersion": 1,
   "turboVersion": "1.0.4",
+  "requiredSkills": [
+    "turbo", "turbo-feature", "turbo-bugfix", "turbo-refactor", "turbo-discovery",
+    "turbo-maintenance", "turbo-hotfix", "turbo-constitution", "turbo-status", "turbo-resume",
+    "turbo-orchestrator", "turbo-product-owner", "turbo-architect", "turbo-implementation-specialist",
+    "turbo-test-engineer", "turbo-code-reviewer", "turbo-constitution-facilitator",
+    "turbo-visual-specifier", "turbo-tdd-coach"
+  ],
   "source": "https://github.com/lorbiesky/speckit-turbo",
   "specKit": {
     "integration": "codex",
@@ -16,6 +23,7 @@
     ".specify/turbo/runtime/workflows",
     ".specify/turbo/templates/constitution-*",
     ".specify/turbo/templates/tdd-cycle.md",
+    ".specify/turbo/templates/validation-evidence.md",
     ".specify/turbo/templates/visual-spec.md",
     ".specify/turbo/project.yml",
     ".specify/turbo/state.json"
