@@ -5,4 +5,4 @@ description: Create, update, or resume a project constitution through the Spec K
 
 # Turbo Constitution
 
-Start or resume `constitution` with the local runtime, then delegate to `turbo-constitution-facilitator`. Diagnose before asking one question at a time. Preserve the final constitution until the draft is approved; record rejection, contradictions, and pending questions in the interview artifact.
+Start or resume the `constitution` workflow through the agent orchestration contract, then delegate to `turbo-constitution-facilitator`. Diagnose before asking one question at a time. Preserve the final constitution until the draft is approved; record rejection, contradictions, and pending questions in the interview artifact.

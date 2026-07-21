@@ -83,6 +83,8 @@ The project-local manifest fixes the Turbo version and identifies managed assets
 
 `.specify/turbo/turbo.js` is the self-contained Node runtime between declarative workflow YAML and agent work. It creates the phase list for the selected classification, evaluates conditions and earlier-phase preconditions, skips inapplicable phases, verifies one evidence entry for each gate requirement, and records human approval or rejection. Skills still perform discovery, implementation, testing, and review; the runtime only makes their handoffs and resumptions unambiguous.
 
+Implementation workflows also declare a conditional `tdd-preparation` phase. When `tdd.enabled` is true, its red evidence is a prerequisite and implementation gates require green and refactor evidence. A documented exception is represented in state and requires human approval; disabling TDD is an explicit project-profile decision.
+
 ## Socratic constitution flow
 
 The constitution workflow persists diagnosis, questions, answers, decisions, contradictions, confidence, draft path, and approval status. A draft is written to `.specify/memory/constitution.draft.md`; the final constitution changes only after approval. Interrupted interviews resume from `.specify/turbo/state.json`.

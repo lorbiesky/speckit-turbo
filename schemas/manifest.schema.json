@@ -38,6 +38,16 @@
         "bootstrap": { "type": "boolean" },
         "backup": { "type": ["string", "null"] }
       }
+    },
+    "legacyMigration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["removed", "backup", "migratedAt"],
+      "properties": {
+        "removed": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "backup": { "type": ["string", "null"] },
+        "migratedAt": { "type": "string", "format": "date-time" }
+      }
     }
   }
 }

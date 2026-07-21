@@ -100,6 +100,23 @@ phases:
         - parallel_work_marked
         - no_unresolved_spec_plan_conflicts
 
+  - id: tdd-preparation
+    owner: turbo-tdd-coach
+    provides:
+      - tdd_cycle_ready
+    satisfies_on_skip: true
+    condition: tdd_enabled
+    preconditions:
+      - tasks_ready
+    outputs:
+      - .specify/turbo/tdd-cycle.md
+      - .specify/turbo/state.json
+    on_blocked: pause_and_record
+    gate:
+      require:
+        - test_strategy_defined
+        - red_test_evidence_recorded
+
   - id: implementation
     owner: turbo-implementation-specialist
     provides:
@@ -108,12 +125,17 @@ phases:
       - speckit-implement
     preconditions:
       - tasks_ready
+      - tdd_cycle_ready
     on_blocked: pause_and_record
     gate:
       require:
         - implementation_matches_tasks
         - deviations_recorded
         - repository_rules_followed
+      require_when:
+        tdd_enabled:
+          - green_cycle_evidence_recorded
+          - refactor_evidence_recorded
 
   - id: validation
     owner: turbo-test-engineer

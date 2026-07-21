@@ -19,6 +19,11 @@ constitution:
     - collaboration
     - governance
 
+tdd:
+  enabled: true
+  allow_exception: true
+  require_human_approval_for_exception: true
+
 visual:
   enabled: true
   persist_references: false

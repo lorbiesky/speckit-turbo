@@ -5,4 +5,4 @@ description: Start the Spec Kit Turbo feature workflow for a requested user-visi
 
 # Turbo Feature
 
-Load the project profile and start `feature` with a concise work id using the local runtime. Add `--visual-input` for every attached screenshot. Hand off to `turbo-orchestrator`, then follow the workflow without skipping gates. Pause if problem, scope, or acceptance criteria are materially ambiguous.
+Load the project profile and start the `feature` workflow through the agent orchestration contract. Treat every attached screenshot as an automatic visual input. Hand off to `turbo-orchestrator`, then follow the workflow without skipping gates. Pause if problem, scope, or acceptance criteria are materially ambiguous.

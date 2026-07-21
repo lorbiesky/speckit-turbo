@@ -66,12 +66,24 @@ phases:
         - rollback_points_identified
         - task_order_and_dependencies_explicit
 
+  - id: tdd-preparation
+    owner: turbo-tdd-coach
+    provides: [tdd_cycle_ready]
+    satisfies_on_skip: true
+    condition: tdd_enabled
+    preconditions: [transformation_plan_ready]
+    outputs: [.specify/turbo/tdd-cycle.md, .specify/turbo/state.json]
+    gate:
+      require: [test_strategy_defined, red_test_evidence_recorded]
+    on_blocked: pause_and_record
+
   - id: implementation
     owner: turbo-implementation-specialist
     provides:
       - implementation_ready
     preconditions:
       - transformation_plan_ready
+      - tdd_cycle_ready
     invokes:
       - speckit-implement
     on_blocked: pause_and_record
@@ -80,6 +92,10 @@ phases:
         - invariants_preserved_per_increment
         - unrelated_cleanup_excluded
         - deviations_recorded
+      require_when:
+        tdd_enabled:
+          - green_cycle_evidence_recorded
+          - refactor_evidence_recorded
 
   - id: validation
     owner: turbo-test-engineer

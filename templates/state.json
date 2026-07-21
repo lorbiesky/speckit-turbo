@@ -23,6 +23,15 @@
   "openQuestions": [],
   "validations": [],
   "deviations": [],
+  "tdd": {
+    "enabled": true,
+    "status": "not_started",
+    "artifactPath": ".specify/turbo/tdd-cycle.md",
+    "redEvidence": [],
+    "greenEvidence": [],
+    "refactorEvidence": [],
+    "exception": null
+  },
   "constitutionInterview": {
     "mode": "create",
     "status": "not_started",

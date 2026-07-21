@@ -95,6 +95,8 @@ When classification is uncertain, pause and present the competing interpretation
 
 ## Phase gates
 
+Workflows with implementation include `tdd-preparation` when `project.yml` has `tdd.enabled: true`. Route that phase to `turbo-tdd-coach`; do not activate implementation until its red evidence gate passes. TDD exceptions require reason, risk, alternative validation and human approval.
+
 Do not advance when:
 
 - the current artifact is missing required sections;

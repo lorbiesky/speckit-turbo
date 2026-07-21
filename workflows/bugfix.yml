@@ -57,6 +57,17 @@ phases:
         - regression_test_defined
         - rollback_or_recovery_considered
 
+  - id: tdd-preparation
+    owner: turbo-tdd-coach
+    provides: [tdd_cycle_ready]
+    satisfies_on_skip: true
+    condition: tdd_enabled
+    preconditions: [root_cause_complete, correction_plan_ready]
+    outputs: [.specify/turbo/tdd-cycle.md, .specify/turbo/state.json]
+    gate:
+      require: [test_strategy_defined, red_test_evidence_recorded]
+    on_blocked: pause_and_record
+
   - id: implementation
     owner: turbo-implementation-specialist
     provides:
@@ -64,6 +75,7 @@ phases:
     preconditions:
       - root_cause_complete
       - correction_plan_ready
+      - tdd_cycle_ready
     invokes:
       - speckit-tasks
       - speckit-implement
@@ -73,6 +85,10 @@ phases:
         - root_cause_addressed
         - unrelated_changes_excluded
         - regression_coverage_added
+      require_when:
+        tdd_enabled:
+          - green_cycle_evidence_recorded
+          - refactor_evidence_recorded
 
   - id: validation
     owner: turbo-test-engineer

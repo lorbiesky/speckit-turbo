@@ -80,6 +80,8 @@ Provide evidence for the classification. Do not weaken or remove a test merely t
 
 ## Gate policy
 
+When TDD is enabled, validate the red, green and refactor evidence recorded in `tdd-cycle.md`. A passing test without preceding red evidence is insufficient.
+
 The validation phase cannot pass when:
 
 - a required acceptance criterion lacks evidence;

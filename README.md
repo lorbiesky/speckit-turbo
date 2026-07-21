@@ -20,9 +20,10 @@ Pedido → classificação → workflow → skill responsável → artefatos/gat
 
 - instalação limpa ou adaptação segura de um projeto que já usa Spec Kit;
 - workflows para `feature`, `bugfix`, `refactor`, `discovery`, `maintenance`, `hotfix` e `constitution`;
-- skills para orquestração, produto, arquitetura, implementação, testes, revisão, constitution socrática e especificação visual;
+- skills para orquestração, produto, arquitetura, implementação, TDD, testes, revisão, constitution socrática e especificação visual;
 - estado persistente em `.specify/turbo/state.json`, com retomada por outro agente ou sessão;
 - gates com evidência obrigatória e checkpoints humanos configuráveis;
+- TDD configurável para toda implementação, com ciclo red → green → refactor e exceções auditáveis;
 - criação e atualização segura da constitution por entrevista socrática;
 - análise de screenshots em `visual-spec.md`, com critérios visuais `VAC-*`;
 - proteção de referências visuais persistidas com `.gitignore` e `git check-ignore`;
@@ -56,40 +57,6 @@ speckit-turbo init ../meu-projeto --mode existing
 ```
 
 O pacote npm inclui workflows, skills, templates, schemas e um runtime Node autocontido. Não há pré-requisito de Python, `pip` ou PyYAML para instalar, diagnosticar ou conduzir fluxos. Use `npx speckit-turbo@latest help` para ver os comandos, `npx speckit-turbo@latest doctor . --strict` para diagnosticar um consumidor e `npx speckit-turbo@latest version .` para consultar a versão instalada.
-
-## Instalação a partir do clone
-
-Os comandos abaixo são uma alternativa para executar a partir do clone do **Spec Kit Turbo** — útil no desenvolvimento local antes da publicação no npm.
-
-### Projeto novo: modo `clean`
-
-O Turbo inicializa primeiro o Spec Kit através da Specify CLI e depois instala seus assets. A versão upstream é obrigatória para a instalação ser reprodutível.
-
-```bash
-./scripts/install.sh --mode clean --spec-kit-version v0.8.11 ../meu-projeto
-```
-
-### Projeto que já usa Spec Kit: modo `existing`
-
-Use este modo para adaptar uma instalação existente sem alterar constitution, templates, scripts, specs ou comandos upstream.
-
-```bash
-./scripts/install.sh --mode existing ../meu-projeto
-```
-
-### Detecção automática: modo `auto`
-
-`auto` seleciona `existing` quando `.specify/` possui `memory/constitution.md`, `templates/` ou `scripts/`; caso contrário, seleciona `clean`.
-
-```bash
-./scripts/install.sh --mode auto --spec-kit-version v0.8.11 ../meu-projeto
-```
-
-Pelo clone, em PowerShell:
-
-```powershell
-./scripts/install.ps1 ../meu-projeto
-```
 
 O instalador altera somente assets gerenciados pelo Turbo:
 
@@ -126,7 +93,25 @@ workflow:
   human_checkpoints:
     - product-specification
     - technical-plan
+
+tdd:
+  enabled: true
+  allow_exception: true
+  require_human_approval_for_exception: true
 ```
+
+### TDD como pré-requisito
+
+Em novas instalações, toda implementação passa por `tdd-preparation`. O agente cria o teste, comprova o estado red, implementa até green e registra o refactor em `.specify/turbo/tdd-cycle.md`. O runtime não libera a implementação sem essas evidências.
+
+Para desativar o requisito no projeto:
+
+```yaml
+tdd:
+  enabled: false
+```
+
+Quando TDD não for aplicável, informe ao agente o motivo, o risco e a validação alternativa. O orquestrador registra a exceção e pausa em um checkpoint humano; a implementação só continua após aprovação explícita. Nunca edite o estado manualmente para ignorar o gate.
 
 Cada fase listada em `human_checkpoints` para em `awaiting_approval` depois de reunir as evidências. Uma fase declarada como checkpoint `always` — por exemplo, a aprovação da constitution — sempre pede decisão humana.
 
@@ -159,14 +144,14 @@ $turbo-resume
 
 Atalhos explícitos estão disponíveis quando a classificação já é conhecida: `$turbo-feature`, `$turbo-bugfix`, `$turbo-refactor`, `$turbo-discovery`, `$turbo-maintenance`, `$turbo-hotfix` e `$turbo-constitution`. Eles complementam — e não substituem — os comandos upstream `$speckit-*`.
 
-O runtime instalado é `.specify/turbo/turbo.js`. Ele **não executa as skills nem comandos do Spec Kit sozinho**: o agente realiza o trabalho e produz os artefatos; o runtime registra o fluxo e só permite avançar com a evidência requerida.
+O runtime instalado é um detalhe interno do Turbo. O usuário não precisa executá-lo nem editar seu estado: as skills e o `turbo-orchestrator` controlam fases, evidências, checkpoints e retomadas.
 
-Todos os comandos abaixo devem ser executados na raiz do projeto consumidor.
+### 1. Inicie um trabalho pelo agente
 
-### 1. Inicie um trabalho
+Use a intenção natural ou o atalho correspondente:
 
-```bash
-node .specify/turbo/turbo.js workflow --path . start feature --work-id checkout-guest
+```text
+$turbo-feature Criar checkout como visitante
 ```
 
 Classificações disponíveis:
@@ -181,7 +166,7 @@ Classificações disponíveis:
 | `hotfix` | correção urgente com contenção e risco de produção |
 | `constitution` | criação ou evolução das regras de engenharia do projeto |
 
-O comando cria as fases do workflow em `state.json` e mostra a fase aplicável atual, o responsável e os requisitos do gate. O template inicial pode ser substituído automaticamente; para substituir um trabalho já iniciado, use `--force` conscientemente.
+O agente cria ou retoma as fases em `state.json` e informa a fase atual, o responsável, os artefatos e os requisitos do gate.
 
 ### 2. Siga a skill indicada
 
@@ -201,57 +186,16 @@ turbo-orchestrator
 → delivery-summary.md
 ```
 
-### 3. Registre a conclusão da fase
+### 3. Evidências, checkpoints e retomadas
 
-Cada item do gate deve receber uma evidência curta, verificável e vinculada a um artefato, comando, teste ou decisão. Use o identificador exibido pelo runtime.
-
-```bash
-node .specify/turbo/turbo.js workflow --path . complete intake \
-  --evidence classified_as_feature="Pedido classificado como feature no state.json" \
-  --evidence scope_recorded="Escopo e exclusões registrados em spec.md" \
-  --evidence project_profile_loaded="project.yml revisado para Angular"
-```
-
-Se faltar evidência ou o identificador não pertencer ao gate, o comando falha e o estado não avança. Isso evita concluir uma fase apenas por declaração.
-
-### 4. Trate checkpoints humanos
-
-Depois de concluir uma fase configurada como checkpoint, o runtime fica pausado. Registre a decisão de forma explícita:
-
-```bash
-node .specify/turbo/turbo.js workflow --path . checkpoint technical-plan \
-  --approve --note "Plano aprovado pela equipe em 2026-07-21"
-```
-
-Ou bloqueie o avanço e preserve o motivo:
-
-```bash
-node .specify/turbo/turbo.js workflow --path . checkpoint technical-plan \
-  --reject --note "Avaliar impacto da nova dependência antes de seguir"
-```
-
-Após resolver uma rejeição ou bloqueio, retome:
-
-```bash
-node .specify/turbo/turbo.js workflow --path . resume
-```
-
-### 5. Consulte ou atualize o estado
-
-```bash
-node .specify/turbo/turbo.js workflow --path . status
-node .specify/turbo/turbo.js workflow --path . status --refresh
-```
-
-`--refresh` reavalia condições e precondições declaradas. Ele pula fases não aplicáveis — por exemplo, `visual-analysis` sem print — e mostra a próxima ação segura.
+O agente registra cada evidência vinculada a artefatos, comandos, testes ou decisões. Quando uma fase exige aprovação, ele apresenta o contexto e aguarda sua decisão. Use `$turbo-status` para consultar o estado e `$turbo-resume` para retomar um bloqueio ou interrupção.
 
 ## Screenshots e especificações visuais
 
-Ao abrir uma feature com print, informe os arquivos de entrada ao iniciar o workflow:
+Ao abrir uma feature com print, anexe a imagem à solicitação do agente:
 
-```bash
-node .specify/turbo/turbo.js workflow --path . start feature \
-  --work-id checkout-ui --visual-input /caminho/do/print.png
+```text
+$turbo-feature Implementar esta tela conforme o print anexado.
 ```
 
 Isso ativa `turbo-visual-specifier` antes da especificação de produto. A skill transforma a imagem em `visual-spec.md`, separando fatos `observed`, hipóteses `inferred`, lacunas `unknown`, confiança e critérios de aceite `VAC-*`. A especificação de produto só fica disponível após a conclusão dessa fase.
@@ -279,10 +223,10 @@ Antes de persistir uma imagem, a skill deve confirmar `git check-ignore`. Se a p
 
 ## Constitution socrática
 
-Para criar ou atualizar as regras de engenharia, inicie o workflow `constitution` e siga `turbo-constitution-facilitator`:
+Para criar ou atualizar as regras de engenharia, use:
 
-```bash
-node .specify/turbo/turbo.js workflow --path . start constitution --work-id engineering-principles
+```text
+$turbo-constitution Criar ou atualizar a constitution do projeto
 ```
 
 O facilitador:
@@ -338,8 +282,8 @@ Antes de enviar mudanças, execute:
 
 ```bash
 python3 scripts/validate.py
-python3 -m unittest discover -s tests -v
-sh -n scripts/install.sh scripts/upgrade.sh
+npm test
+npm pack --dry-run
 git diff --check
 ```
 

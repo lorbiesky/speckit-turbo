@@ -106,6 +106,30 @@
         }
       }
     },
+    "tdd": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "status", "artifactPath", "redEvidence", "greenEvidence", "refactorEvidence", "exception"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "status": { "enum": ["not_started", "red_ready", "green", "refactored", "skipped", "blocked", "exception", "completed"] },
+        "artifactPath": { "type": "string", "minLength": 1 },
+        "redEvidence": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "greenEvidence": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "refactorEvidence": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "exception": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["reason", "risk", "alternativeValidation", "approval"],
+          "properties": {
+            "reason": { "type": "string", "minLength": 1 },
+            "risk": { "type": "string", "minLength": 1 },
+            "alternativeValidation": { "type": "string", "minLength": 1 },
+            "approval": { "enum": ["pending", "approved", "rejected"] }
+          }
+        }
+      }
+    },
     "constitutionInterview": {
       "type": "object",
       "additionalProperties": false,

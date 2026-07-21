@@ -27,33 +27,7 @@ Python is only required for contributors running the repository's legacy validat
 
 Use automatic detection by default. A structured `.specify` directory containing `memory/constitution.md`, `templates/`, or `scripts/` selects adaptation mode.
 
-Clean mode delegates upstream initialization to Specify CLI. It requires an explicit upstream ref:
-
-```bash
-./scripts/install.sh --mode clean --spec-kit-version v0.8.11 ../path-to-project
-```
-
-Existing mode preserves upstream Spec Kit files and adds Turbo alongside them:
-
-```bash
-./scripts/install.sh --mode existing ../path-to-project
-```
-
-Use `--mode auto` to make detection explicit in automation. Clean mode requires `uv` and network access unless `SPECKIT_TURBO_BOOTSTRAP_COMMAND` is supplied by a controlled test or environment.
-
-## Installation from a local clone
-
-The npm package is the recommended path. These shell and PowerShell wrappers remain available for local Turbo development and compatibility; they use the legacy Python installer.
-
-```bash
-./scripts/install.sh ../path-to-project
-```
-
-## Windows PowerShell
-
-```powershell
-./scripts/install.ps1 ../path-to-project
-```
+Use `--mode clean|existing|auto` to select the installation behavior. Clean mode delegates upstream initialization to Specify CLI and requires `--spec-kit-version`; existing mode preserves upstream Spec Kit files and adds Turbo alongside them.
 
 The installer preserves existing project configuration and adds or refreshes only managed Turbo assets. When updating an existing Turbo installation, it creates a dated backup under `.specify/turbo/backups/`.
 
@@ -65,9 +39,20 @@ project/
 ├── .agents/
 │   └── skills/
 │       ├── turbo-orchestrator/
+│       ├── turbo/
+│       ├── turbo-feature/
+│       ├── turbo-bugfix/
+│       ├── turbo-refactor/
+│       ├── turbo-discovery/
+│       ├── turbo-maintenance/
+│       ├── turbo-hotfix/
+│       ├── turbo-constitution/
+│       ├── turbo-status/
+│       ├── turbo-resume/
 │       ├── turbo-product-owner/
 │       ├── turbo-architect/
 │       ├── turbo-constitution-facilitator/
+│       ├── turbo-tdd-coach/
 │       ├── turbo-test-engineer/
 │       └── turbo-code-reviewer/
 └── .specify/
@@ -83,6 +68,7 @@ project/
         ├── templates/
         │   ├── constitution-interview.md
         │   ├── constitution.draft.md
+        │   ├── tdd-cycle.md
         │   └── visual-spec.md
         └── runtime/
             ├── schemas/
@@ -117,6 +103,19 @@ commands:
 
 Keep the workflow booleans and documentation policy from the generated template unless the project requires different human checkpoints.
 
+### TDD
+
+New projects enable TDD by default. Implementation workflows require a failing test before production code and evidence of the green and refactor steps afterward:
+
+```yaml
+tdd:
+  enabled: true
+  allow_exception: true
+  require_human_approval_for_exception: true
+```
+
+Set `tdd.enabled: false` when the project explicitly does not use TDD. When it remains enabled, tell the agent why TDD is not applicable and provide the risk and alternative validation. The orchestrator records the exception and requests human approval before continuing. Never edit `state.json` to bypass the gate. The cycle is persisted in `.specify/turbo/tdd-cycle.md` and `state.json`.
+
 ## Diagnose the installation
 
 Run from the consumer project root:
@@ -139,7 +138,7 @@ The Node doctor verifies:
 - basic project-profile placeholders;
 - visual-reference ignore protection, constitution drafts, and backup protection.
 
-The deeper schema, workflow, quality-command, installation-mode, and constitution-contract checks remain available through the contributor validator and legacy Python doctor.
+The deeper schema, workflow, and contract checks remain available through the contributor validator. Consumer operations use npm for installation and maintenance, and agent commands for development workflows.
 
 Visual references are disabled by default. To persist them safely, configure:
 
@@ -152,9 +151,23 @@ visual:
 
 The installer maintains a managed `.gitignore` block for that directory. The visual skill verifies the rule with `git check-ignore` before copying any image. The doctor reports an error for existing unignored references.
 
-## Dynamic workflow runtime
+When upgrading a project installed by Turbo `1.0.1` or earlier, the npm CLI backs up and removes only the known legacy Python runtime files. Unknown files and project-owned configuration remain untouched.
 
-The installed runtime is `.specify/turbo/turbo.js`. It initializes the state from a workflow classification, evaluates declared conditions and preconditions, skips inapplicable phases, requires evidence for every gate requirement, pauses at configured human checkpoints, and resumes work without losing phase state. It does not replace the coding agent or run Spec Kit commands by itself.
+## Uso por agentes
+
+O runtime local é um detalhe interno entre as skills, os workflows declarativos e o estado persistente. O usuário não precisa executá-lo. Use os comandos de agente:
+
+```text
+$turbo Criar checkout como visitante
+$turbo-feature Implementar esta tela conforme o print anexado
+$turbo-bugfix Corrigir erro de autenticação
+$turbo-refactor Extrair o módulo de pagamentos
+$turbo-status
+$turbo-resume
+$turbo-constitution Atualizar as regras de engenharia
+```
+
+O `turbo-orchestrator` inicia ou retoma o workflow, encaminha cada fase para a skill responsável, registra evidências e pausa em checkpoints humanos. As skills invocam `$speckit-specify`, `$speckit-plan`, `$speckit-tasks`, `$speckit-analyze` e `$speckit-implement` quando declarados pelo workflow.
 
 Configure optional checkpoints in `project.yml`:
 
@@ -165,7 +178,7 @@ workflow:
     - technical-plan
 ```
 
-Use `start`, `status --refresh`, `complete`, `checkpoint --approve|--reject`, and `resume` to operate the state. `start` safely replaces only the untouched template state; use `--force` to deliberately replace active work.
+Não opere fases editando `state.json` ou executando scripts internos. Consulte `$turbo-status`, resolva o bloqueio indicado e use `$turbo-resume` para continuar.
 
 ## Socratic constitution
 
@@ -179,6 +192,8 @@ $turbo-status
 $turbo-resume
 ```
 
+Para screenshots, basta anexar a imagem ao pedido. A análise visual será ativada automaticamente, gerará `visual-spec.md` e critérios `VAC-*`, e bloqueará a persistência se o diretório não estiver protegido pelo `.gitignore`.
+
 ## Reinstall or update
 
 Run the npm upgrade after a new Turbo version is published. Existing `project.yml`, `state.json`, constitution, specs, templates, upstream commands, and non-managed `AGENTS.md` content are preserved. Skills, shared rules, schemas, workflows, manifest, Node runtime, and doctor command are refreshed.
@@ -186,10 +201,7 @@ Run the npm upgrade after a new Turbo version is published. Existing `project.ym
 ```bash
 npx speckit-turbo@latest version .
 npx speckit-turbo@latest upgrade ../meu-projeto
-sh .specify/turbo/upgrade.sh /caminho/para/speckit-turbo .
 ```
-
-The final shell command is only for compatibility when developing from a local clone; npm users should use `speckit-turbo upgrade`.
 
 The installed manifest is `.specify/turbo/manifest.json`. It records the Turbo version, Codex integration, Spec Kit concepts expected by the workflows, and managed paths. The `AGENTS.md` integration block is added only once and is never replaced by an upgrade.
 
@@ -204,4 +216,4 @@ python3 -m pip install -r requirements-dev.txt
 python3 scripts/validate.py
 ```
 
-This validates schemas, templates, skill metadata, workflow structure, owner references, gates, and classification uniqueness.
+This validates schemas, templates, skill metadata, workflow structure, owner references, gates, and classification uniqueness. Python is used only for contributor validation and is not required by consumer projects.

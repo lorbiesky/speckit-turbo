@@ -78,6 +78,15 @@
         }
       }
     },
+    "tdd": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "allow_exception": { "type": "boolean", "default": true },
+        "require_human_approval_for_exception": { "type": "boolean", "default": true }
+      }
+    },
     "visual": {
       "type": "object",
       "additionalProperties": false,

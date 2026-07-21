@@ -5,4 +5,4 @@ description: Start the Spec Kit Turbo refactor workflow for structural changes t
 
 # Turbo Refactor
 
-Start `refactor` with the local runtime and a concise work id. Record motivation and invariants before changing code. Follow architecture analysis, regression baseline, incremental planning, validation, and review. Reclassify as feature if behavior must change.
+Start the `refactor` workflow through the agent orchestration contract. Record motivation and invariants before changing code. Follow architecture analysis, regression baseline, incremental planning, validation, and review. Reclassify as feature if behavior must change.
