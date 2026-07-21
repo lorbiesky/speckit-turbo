@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "turboVersion": "1.0.4",
+  "turboVersion": "1.0.5",
   "requiredSkills": [
     "turbo", "turbo-feature", "turbo-bugfix", "turbo-refactor", "turbo-discovery",
     "turbo-maintenance", "turbo-hotfix", "turbo-constitution", "turbo-status", "turbo-resume",

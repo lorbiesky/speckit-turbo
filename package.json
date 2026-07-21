@@ -1,6 +1,6 @@
 {
   "name": "speckit-turbo",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Reusable, state-driven workflows for GitHub Spec Kit and code agents.",
   "license": "MIT",
   "bin": {
