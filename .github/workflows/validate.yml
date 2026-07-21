@@ -18,6 +18,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Run npm tests
+        run: npm test
+
+      - name: Check npm package contents
+        run: npm pack --dry-run
+
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -33,6 +48,3 @@ jobs:
 
       - name: Compile Python scripts
         run: python -m compileall -q scripts
-
-      - name: Check shell syntax
-        run: sh -n scripts/install.sh

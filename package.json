@@ -1,6 +1,6 @@
 {
   "name": "speckit-turbo",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Reusable, state-driven workflows for GitHub Spec Kit and code agents.",
   "license": "MIT",
   "bin": {
@@ -12,13 +12,13 @@
     "manifest.json",
     "src/",
     "schemas/",
-    "scripts/",
+    "scripts/validate.py",
     "skills/",
     "templates/",
     "workflows/"
   ],
   "scripts": {
-    "test": "node --test test/*.test.js && python3 -m unittest discover -s tests -v",
+    "test": "node --test test/*.test.js",
     "validate": "python3 scripts/validate.py"
   },
   "dependencies": {

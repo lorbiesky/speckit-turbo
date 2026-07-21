@@ -57,40 +57,6 @@ speckit-turbo init ../meu-projeto --mode existing
 
 O pacote npm inclui workflows, skills, templates, schemas e um runtime Node autocontido. Não há pré-requisito de Python, `pip` ou PyYAML para instalar, diagnosticar ou conduzir fluxos. Use `npx speckit-turbo@latest help` para ver os comandos, `npx speckit-turbo@latest doctor . --strict` para diagnosticar um consumidor e `npx speckit-turbo@latest version .` para consultar a versão instalada.
 
-## Instalação a partir do clone
-
-Os comandos abaixo são uma alternativa para executar a partir do clone do **Spec Kit Turbo** — útil no desenvolvimento local antes da publicação no npm.
-
-### Projeto novo: modo `clean`
-
-O Turbo inicializa primeiro o Spec Kit através da Specify CLI e depois instala seus assets. A versão upstream é obrigatória para a instalação ser reprodutível.
-
-```bash
-./scripts/install.sh --mode clean --spec-kit-version v0.8.11 ../meu-projeto
-```
-
-### Projeto que já usa Spec Kit: modo `existing`
-
-Use este modo para adaptar uma instalação existente sem alterar constitution, templates, scripts, specs ou comandos upstream.
-
-```bash
-./scripts/install.sh --mode existing ../meu-projeto
-```
-
-### Detecção automática: modo `auto`
-
-`auto` seleciona `existing` quando `.specify/` possui `memory/constitution.md`, `templates/` ou `scripts/`; caso contrário, seleciona `clean`.
-
-```bash
-./scripts/install.sh --mode auto --spec-kit-version v0.8.11 ../meu-projeto
-```
-
-Pelo clone, em PowerShell:
-
-```powershell
-./scripts/install.ps1 ../meu-projeto
-```
-
 O instalador altera somente assets gerenciados pelo Turbo:
 
 ```text
@@ -338,8 +304,8 @@ Antes de enviar mudanças, execute:
 
 ```bash
 python3 scripts/validate.py
-python3 -m unittest discover -s tests -v
-sh -n scripts/install.sh scripts/upgrade.sh
+npm test
+npm pack --dry-run
 git diff --check
 ```
 

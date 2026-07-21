@@ -14,6 +14,7 @@ const PACKAGE_ROOT = path.resolve(__dirname, "..");
 const START = "<!-- speckit-turbo:start -->", END = "<!-- speckit-turbo:end -->";
 const IGNORE_START = "# speckit-turbo:start", IGNORE_END = "# speckit-turbo:end", IGNORE_ENTRY = ".specify/visual-references/";
 const SIGNALS = ["memory/constitution.md", "templates", "scripts"];
+const LEGACY_FILES = ["doctor.py", "workflow_runtime.py", "version.py", "upgrade.sh"];
 const REQUIRED_SKILLS = ["turbo", "turbo-status", "turbo-resume", "turbo-orchestrator", "turbo-product-owner", "turbo-architect", "turbo-implementation-specialist", "turbo-test-engineer", "turbo-code-reviewer", "turbo-constitution-facilitator", "turbo-visual-specifier"];
 
 const exists = (file) => fs.existsSync(file);
@@ -68,6 +69,14 @@ function backup(turbo, version) {
   }
   return destination;
 }
+function migrateLegacy(turbo) {
+  const removed = [];
+  for (const name of LEGACY_FILES) {
+    const file = path.join(turbo, name);
+    if (exists(file)) { remove(file); removed.push(`.specify/turbo/${name}`); }
+  }
+  return removed;
+}
 function snapshot(root) {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), "speckit-turbo-"));
   const names = [".specify", ".agents", ".github", ".claude", "AGENTS.md", ".gitignore"];
@@ -105,16 +114,16 @@ function install(args) {
   }
   try { managedIgnore(root); } catch (error) { fail(error.message); }
   const saved = oldManifest ? backup(turbo, oldManifest.turboVersion) : null;
+  const legacyRemoved = oldManifest ? migrateLegacy(turbo) : [];
   fs.mkdirSync(turbo, { recursive: true });
   fs.mkdirSync(path.join(root, ".agents/skills"), { recursive: true });
   for (const skill of fs.readdirSync(path.join(PACKAGE_ROOT, "skills")).filter((name) => name.startsWith("turbo"))) copy(path.join(PACKAGE_ROOT, "skills", skill), path.join(root, ".agents/skills", skill));
   copy(path.join(PACKAGE_ROOT, "schemas"), path.join(turbo, "runtime/schemas")); copy(path.join(PACKAGE_ROOT, "workflows"), path.join(turbo, "runtime/workflows"));
   fs.mkdirSync(path.join(turbo, "templates"), { recursive: true }); for (const name of ["constitution-interview.md", "constitution.draft.md", "visual-spec.md"]) copy(path.join(PACKAGE_ROOT, "templates", name), path.join(turbo, "templates", name));
   copyRuntime(root);
-  for (const name of ["AGENTS.turbo.md", "doctor.py", "workflow_runtime.py", "version.py", "upgrade.sh"]) { const source = name === "AGENTS.turbo.md" ? path.join(PACKAGE_ROOT, name) : path.join(PACKAGE_ROOT, "scripts", name); if (exists(source)) copy(source, path.join(turbo, name)); }
   if (!exists(path.join(turbo, "project.yml"))) copy(path.join(PACKAGE_ROOT, "templates/project.yml"), path.join(turbo, "project.yml"));
   if (!exists(path.join(turbo, "state.json"))) copy(path.join(PACKAGE_ROOT, "templates/state.json"), path.join(turbo, "state.json"));
-  const manifest = json(path.join(PACKAGE_ROOT, "manifest.json")); manifest.installation = { mode, integration: detected, specKitVersion: ref || null, bootstrap: mode === "clean", backup: saved ? path.relative(root, saved) : null }; writeJson(path.join(turbo, "manifest.json"), manifest);
+  const manifest = json(path.join(PACKAGE_ROOT, "manifest.json")); manifest.installation = { mode, integration: detected, specKitVersion: ref || null, bootstrap: mode === "clean", backup: saved ? path.relative(root, saved) : null }; if (legacyRemoved.length) manifest.legacyMigration = { removed: legacyRemoved, backup: saved ? path.relative(root, saved) : null, migratedAt: now() }; writeJson(path.join(turbo, "manifest.json"), manifest);
   const agents = path.join(root, "AGENTS.md"), content = exists(agents) ? read(agents) : "";
   if (!content.includes(START)) fs.writeFileSync(agents, `${content}${content && !content.endsWith("\n") ? "\n" : ""}${START}\n## Spec Kit Turbo\n\nUse \`$turbo\` to start or resume work. The local Node runtime is \`.specify/turbo/turbo.js\`; do not edit workflow state by hand.\n${END}\n`);
   console.log(`Spec Kit Turbo ${manifest.turboVersion} installed in ${root} (${mode}).`); if (detected !== "codex") console.warn(`Warning: '${detected}' integration is preserved; Turbo commands are Codex-first.`);
@@ -168,6 +177,6 @@ function doctor(args) {
   const backups = path.join(turbo, "backups"); if (exists(backups) && !ignore.includes(".specify/turbo/backups/")) warn("Turbo backups are not protected by .gitignore");
   console.log(`\nSummary: ${errors.length} error(s), ${warnings.length} warning(s).`); process.exit(errors.length || (strict && warnings.length) ? 1 : 0);
 }
-function usage(code = 0) { console.log(`Spec Kit Turbo\n\nUsage:\n  speckit-turbo init [directory] [--mode auto|clean|existing] [--spec-kit-version ref]\n  speckit-turbo doctor [directory] [--strict]\n  speckit-turbo upgrade [directory]\n  speckit-turbo version [directory]\n  speckit-turbo workflow --path . <start|status|complete|checkpoint|resume>\n\nCompatibility: install is an alias for init.`); process.exit(code); }
-function main(args = process.argv.slice(2)) { const command = args[0] || "help"; try { if (["help", "--help", "-h"].includes(command)) usage(); if (["init", "install"].includes(command)) return install(args.slice(1)); if (command === "upgrade") return install(["--upgrade", ...args.slice(1)]); if (command === "doctor") return doctor(args.slice(1)); if (command === "version") { const root = path.resolve(args[1] || "."), manifest = exists(path.join(root, ".specify/turbo/manifest.json")) ? path.join(root, ".specify/turbo/manifest.json") : path.join(PACKAGE_ROOT, "manifest.json"); console.log(json(manifest).turboVersion); return; } if (command === "workflow") return runtime(args.slice(1)); usage(2); } catch (error) { fail(error.message, 1); } }
+function usage(code = 0) { console.log(`Spec Kit Turbo\n\nUsage:\n  speckit-turbo init [directory] [--mode auto|clean|existing] [--spec-kit-version ref]\n  speckit-turbo doctor [directory] [--strict]\n  speckit-turbo upgrade [directory]\n  speckit-turbo version [directory]\n  speckit-turbo workflow --path . <start|status|complete|checkpoint|resume>`); process.exit(code); }
+function main(args = process.argv.slice(2)) { const command = args[0] || "help"; try { if (["help", "--help", "-h"].includes(command)) usage(); if (command === "init") return install(args.slice(1)); if (command === "upgrade") return install(["--upgrade", ...args.slice(1)]); if (command === "doctor") return doctor(args.slice(1)); if (command === "version") { const root = path.resolve(args[1] || "."), manifest = exists(path.join(root, ".specify/turbo/manifest.json")) ? path.join(root, ".specify/turbo/manifest.json") : path.join(PACKAGE_ROOT, "manifest.json"); console.log(json(manifest).turboVersion); return; } if (command === "workflow") return runtime(args.slice(1)); usage(2); } catch (error) { fail(error.message, 1); } }
 if (require.main === module) main(); module.exports = { main };

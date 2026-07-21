@@ -27,33 +27,7 @@ Python is only required for contributors running the repository's legacy validat
 
 Use automatic detection by default. A structured `.specify` directory containing `memory/constitution.md`, `templates/`, or `scripts/` selects adaptation mode.
 
-Clean mode delegates upstream initialization to Specify CLI. It requires an explicit upstream ref:
-
-```bash
-./scripts/install.sh --mode clean --spec-kit-version v0.8.11 ../path-to-project
-```
-
-Existing mode preserves upstream Spec Kit files and adds Turbo alongside them:
-
-```bash
-./scripts/install.sh --mode existing ../path-to-project
-```
-
-Use `--mode auto` to make detection explicit in automation. Clean mode requires `uv` and network access unless `SPECKIT_TURBO_BOOTSTRAP_COMMAND` is supplied by a controlled test or environment.
-
-## Installation from a local clone
-
-The npm package is the recommended path. These shell and PowerShell wrappers remain available for local Turbo development and compatibility; they use the legacy Python installer.
-
-```bash
-./scripts/install.sh ../path-to-project
-```
-
-## Windows PowerShell
-
-```powershell
-./scripts/install.ps1 ../path-to-project
-```
+Use `--mode clean|existing|auto` to select the installation behavior. Clean mode delegates upstream initialization to Specify CLI and requires `--spec-kit-version`; existing mode preserves upstream Spec Kit files and adds Turbo alongside them.
 
 The installer preserves existing project configuration and adds or refreshes only managed Turbo assets. When updating an existing Turbo installation, it creates a dated backup under `.specify/turbo/backups/`.
 
@@ -65,6 +39,16 @@ project/
 ├── .agents/
 │   └── skills/
 │       ├── turbo-orchestrator/
+│       ├── turbo/
+│       ├── turbo-feature/
+│       ├── turbo-bugfix/
+│       ├── turbo-refactor/
+│       ├── turbo-discovery/
+│       ├── turbo-maintenance/
+│       ├── turbo-hotfix/
+│       ├── turbo-constitution/
+│       ├── turbo-status/
+│       ├── turbo-resume/
 │       ├── turbo-product-owner/
 │       ├── turbo-architect/
 │       ├── turbo-constitution-facilitator/
@@ -139,7 +123,7 @@ The Node doctor verifies:
 - basic project-profile placeholders;
 - visual-reference ignore protection, constitution drafts, and backup protection.
 
-The deeper schema, workflow, quality-command, installation-mode, and constitution-contract checks remain available through the contributor validator and legacy Python doctor.
+The deeper schema, workflow, and contract checks remain available through the contributor validator. The consumer interface remains Node-only.
 
 Visual references are disabled by default. To persist them safely, configure:
 
@@ -151,6 +135,8 @@ visual:
 ```
 
 The installer maintains a managed `.gitignore` block for that directory. The visual skill verifies the rule with `git check-ignore` before copying any image. The doctor reports an error for existing unignored references.
+
+When upgrading a project installed by Turbo `1.0.1` or earlier, the npm CLI backs up and removes only the known legacy Python runtime files. Unknown files and project-owned configuration remain untouched.
 
 ## Dynamic workflow runtime
 
@@ -186,10 +172,7 @@ Run the npm upgrade after a new Turbo version is published. Existing `project.ym
 ```bash
 npx speckit-turbo@latest version .
 npx speckit-turbo@latest upgrade ../meu-projeto
-sh .specify/turbo/upgrade.sh /caminho/para/speckit-turbo .
 ```
-
-The final shell command is only for compatibility when developing from a local clone; npm users should use `speckit-turbo upgrade`.
 
 The installed manifest is `.specify/turbo/manifest.json`. It records the Turbo version, Codex integration, Spec Kit concepts expected by the workflows, and managed paths. The `AGENTS.md` integration block is added only once and is never replaced by an upgrade.
 
@@ -204,4 +187,4 @@ python3 -m pip install -r requirements-dev.txt
 python3 scripts/validate.py
 ```
 
-This validates schemas, templates, skill metadata, workflow structure, owner references, gates, and classification uniqueness.
+This validates schemas, templates, skill metadata, workflow structure, owner references, gates, and classification uniqueness. Python is used only for contributor validation and is not required by consumer projects.

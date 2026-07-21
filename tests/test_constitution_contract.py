@@ -32,30 +32,6 @@ class ConstitutionContractTests(unittest.TestCase):
         self.assertEqual(approval["human_checkpoint"], "always")
         self.assertIn("human_approval_recorded", approval["gate"]["require"])
 
-    def test_doctor_detects_pending_constitution_draft(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            target = Path(directory) / "consumer"
-            target.mkdir()
-            (target / ".specify/memory").mkdir(parents=True)
-            (target / ".specify/memory/constitution.md").write_text("# Existing constitution\n", encoding="utf-8")
-            subprocess.run(
-                ["sh", str(ROOT / "scripts/install.sh"), "--mode", "existing", str(target)],
-                check=False,
-                cwd=ROOT,
-                capture_output=True,
-                text=True,
-            )
-            # Convert the fixture into a minimal diagnosed Spec Kit consumer.
-            (target / ".specify/memory/constitution-interview.md").write_text("# Interview\n", encoding="utf-8")
-            (target / ".specify/memory/constitution.draft.md").write_text("# Draft\n", encoding="utf-8")
-            result = subprocess.run(
-                ["python3", str(target / ".specify/turbo/doctor.py")],
-                cwd=target,
-                capture_output=True,
-                text=True,
-            )
-            self.assertIn("Constitution draft is present", result.stdout)
-
     def test_state_template_persists_interview_cursor(self) -> None:
         state = json.loads((ROOT / "templates/state.json").read_text(encoding="utf-8"))
         interview = state["constitutionInterview"]
