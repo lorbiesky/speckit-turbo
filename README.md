@@ -43,17 +43,32 @@ python3 -m pip install -r requirements-dev.txt
 
 ## Instalação via npm
 
-O modo recomendado é executar sem instalação global:
+O diretório do projeto é o último argumento do comando. Você não precisa informar o caminho completo: use `.` quando estiver dentro do projeto ou um caminho relativo/absoluto quando estiver em outro diretório.
+
+Dentro da raiz de um projeto que já possui Spec Kit:
 
 ```bash
-npx speckit-turbo@latest init ../meu-projeto --mode existing
+cd meu-projeto
+npx speckit-turbo@latest init . --mode existing
+```
+
+A partir do diretório pai:
+
+```bash
+npx speckit-turbo@latest init ./meu-projeto --mode existing
+```
+
+Para deixar o Turbo detectar automaticamente se a instalação é limpa ou existente:
+
+```bash
+npx speckit-turbo@latest init .
 ```
 
 Ou instale globalmente para usar o comando sem `npx`:
 
 ```bash
 npm install --global speckit-turbo
-speckit-turbo init ../meu-projeto --mode existing
+speckit-turbo init . --mode existing
 ```
 
 O pacote npm inclui workflows, skills, templates, schemas e um runtime Node autocontido. Não há pré-requisito de Python, `pip` ou PyYAML para instalar, diagnosticar ou conduzir fluxos. Use `npx speckit-turbo@latest help` para ver os comandos, `npx speckit-turbo@latest doctor . --strict` para diagnosticar um consumidor e `npx speckit-turbo@latest version .` para consultar a versão instalada.

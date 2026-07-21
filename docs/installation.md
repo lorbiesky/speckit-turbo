@@ -1,16 +1,33 @@
 # Installation
 
-Spec Kit Turbo supports both a clean bootstrap and adaptation of an existing GitHub Spec Kit project. The published npm package is the preferred distribution method:
+Spec Kit Turbo supports both a clean bootstrap and adaptation of an existing GitHub Spec Kit project. The published npm package is the preferred distribution method.
+
+The target directory is the final argument. Use `.` from inside the target project; a full path is not required.
+
+From the existing project's root:
 
 ```bash
-npx speckit-turbo@latest init ../path-to-project --mode existing
+cd path-to-project
+npx speckit-turbo@latest init . --mode existing
+```
+
+From its parent directory:
+
+```bash
+npx speckit-turbo@latest init ./path-to-project --mode existing
+```
+
+Use automatic mode when you want Turbo to detect whether the project is clean or already structured as Spec Kit:
+
+```bash
+npx speckit-turbo@latest init .
 ```
 
 Install globally when preferred:
 
 ```bash
 npm install --global speckit-turbo
-speckit-turbo init ../path-to-project --mode existing
+speckit-turbo init . --mode existing
 ```
 
 The CLI also exposes `speckit-turbo doctor [path] [--strict]`, `speckit-turbo upgrade [path]`, and `speckit-turbo version [path]`. It is implemented in Node and installs a self-contained Node runtime in each consumer project; Python is not a user prerequisite.

@@ -50,7 +50,7 @@ test("npm CLI exposes doctor and version without Python", () => {
   assert.match(doctor.stdout, /Self-contained Node runtime is installed/);
   const version = command(packageBin, ["version", root], ROOT);
   assert.equal(version.status, 0);
-  assert.match(version.stdout, /1\.0\.3/);
+  assert.match(version.stdout, /1\.0\.4/);
 });
 
 test("npm CLI bootstraps clean mode through the upstream command contract", () => {
