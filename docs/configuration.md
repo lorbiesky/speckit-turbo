@@ -1,0 +1,45 @@
+# Configuração de qualidade
+
+O arquivo opcional `.specify/extensions/turbo/turbo-config.yml` pertence somente à extensão Turbo. Comece pelo template instalado e ajuste a política por projeto.
+
+```yaml
+tdd:
+  enabled: true
+  allow_exception: true
+  require_human_approval_for_exception: true
+
+checkpoints:
+  require_human_approval:
+    specification: true
+    plan: true
+    constitution: true
+    tdd_exception: true
+
+visual:
+  enabled: true
+  persist_references: false
+  references_path: .specify/visual-references
+  require_visual_acceptance: true
+  visual_regression: false
+```
+
+## TDD
+
+Com TDD ativo, `$speckit-turbo-tdd` mapeia critérios de aceite para testes e exige evidência do ciclo red → green → refactor antes da implementação. Para desativá-lo explicitamente:
+
+```yaml
+tdd:
+  enabled: false
+```
+
+Uma exceção com TDD ativo não é desativação: o agente registra justificativa, risco e validação alternativa em `tdd-cycle.md`, então pausa para aprovação humana quando a política exigir.
+
+## Screenshots e referências visuais
+
+Anexe o print diretamente ao pedido:
+
+```text
+$speckit-turbo-feature Implementar esta tela conforme o print anexado.
+```
+
+O agente gera `visual-spec.md`, critérios `VAC-*` e perguntas bloqueantes somente quando uma incerteza muda materialmente a implementação. Por padrão a imagem não é salva. Para persistir referências, habilite `persist_references`; antes de copiar qualquer imagem, o comando visual cria ou valida um bloco gerenciado no `.gitignore` e confirma a regra com Git. O Turbo nunca executa `git add` para imagens.

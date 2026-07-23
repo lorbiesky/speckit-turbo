@@ -1,0 +1,14 @@
+schema_version: "1.0"
+workflow:
+  id: turbo-discovery
+  name: "Turbo Discovery"
+  version: "2.0.0"
+  author: lorbiesky
+  description: "Evidence-led discovery that ends in a human scope decision, not implementation."
+requires: { speckit_version: ">=0.11.4" }
+inputs:
+  request: { type: string, required: true, prompt: "What should be explored?" }
+  integration: { type: string, default: auto }
+steps:
+  - { id: discovery, command: speckit.turbo.discovery, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: decision-gate, type: gate, message: "Review discovery findings and decide whether to create implementation work.", options: [approve, reject], on_reject: abort }

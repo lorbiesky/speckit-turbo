@@ -1,0 +1,20 @@
+schema_version: "1.0"
+workflow:
+  id: turbo-maintenance
+  name: "Turbo Maintenance"
+  version: "2.0.0"
+  author: lorbiesky
+  description: "Bounded maintenance with impact assessment and proportionate validation."
+requires: { speckit_version: ">=0.11.4" }
+inputs:
+  request: { type: string, required: true, prompt: "Describe the maintenance work" }
+  integration: { type: string, default: auto }
+steps:
+  - { id: intake, command: speckit.turbo.maintenance, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: specify, command: speckit.specify, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: plan, command: speckit.plan, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: tasks, command: speckit.tasks, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: tdd, command: speckit.turbo.tdd, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: implement, command: speckit.implement, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: analyze, command: speckit.analyze, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: delivery-gate, type: gate, message: "Confirm maintenance validation and delivery evidence.", options: [approve, reject], on_reject: abort }

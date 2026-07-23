@@ -1,0 +1,20 @@
+schema_version: "1.0"
+workflow:
+  id: turbo-hotfix
+  name: "Turbo Hotfix"
+  version: "2.0.0"
+  author: lorbiesky
+  description: "Urgent fix with explicit impact, rollback, risk, and delivery gate."
+requires: { speckit_version: ">=0.11.4" }
+inputs:
+  request: { type: string, required: true, prompt: "Describe the urgent failure" }
+  integration: { type: string, default: auto }
+steps:
+  - { id: intake, command: speckit.turbo.hotfix, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: specify, command: speckit.specify, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: risk-gate, type: gate, message: "Confirm impact, rollback, and safe scope before changing code.", options: [approve, reject], on_reject: abort }
+  - { id: tasks, command: speckit.tasks, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: tdd, command: speckit.turbo.tdd, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: implement, command: speckit.implement, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: analyze, command: speckit.analyze, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: delivery-gate, type: gate, message: "Confirm validation, rollback readiness, and residual risk.", options: [approve, reject], on_reject: abort }

@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "updated_at": "2026-07-23T00:00:00Z",
+  "catalog_url": "https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/bundles.json",
+  "bundles": {
+    "speckit-turbo": {
+      "id": "speckit-turbo",
+      "name": "Spec Kit Turbo",
+      "description": "Native SDD and TDD workflows for GitHub Spec Kit.",
+      "author": "lorbiesky",
+      "version": "2.0.0",
+      "role": "developer",
+      "download_url": "https://github.com/lorbiesky/speckit-turbo/releases/download/v2.0.0/speckit-turbo-bundle-2.0.0.zip",
+      "repository": "https://github.com/lorbiesky/speckit-turbo",
+      "license": "MIT",
+      "requires": { "speckit_version": ">=0.11.4" },
+      "provides": { "extensions": 1, "presets": 0, "steps": 0, "workflows": 7 },
+      "tags": ["sdd", "tdd", "workflow"],
+      "verified": false
+    }
+  }
+}

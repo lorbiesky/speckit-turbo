@@ -1,4 +1,0 @@
-interface:
-  display_name: "Visual Specifier"
-  short_description: "Extract visual specs from screenshots"
-  default_prompt: "Analyze attached screenshots, create a precise visual specification, and derive traceable visual acceptance criteria for implementation."

@@ -1,0 +1,16 @@
+schema_version: "1.0"
+workflow:
+  id: turbo-constitution
+  name: "Turbo Constitution"
+  version: "2.0.0"
+  author: lorbiesky
+  description: "Socratic constitution creation or update with a draft and mandatory human approval."
+requires: { speckit_version: ">=0.11.4" }
+inputs:
+  request: { type: string, required: true, prompt: "Create or update the engineering constitution" }
+  integration: { type: string, default: auto }
+steps:
+  - { id: interview, command: speckit.turbo.constitution, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: approval, type: gate, message: "Review constitution.draft.md. Approve only after all blocking questions and contradictions are resolved.", options: [approve, reject], on_reject: abort }
+  - { id: constitution, command: speckit.constitution, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: validation-gate, type: gate, message: "Confirm the approved constitution is final and the interview is persisted.", options: [approve, reject], on_reject: abort }

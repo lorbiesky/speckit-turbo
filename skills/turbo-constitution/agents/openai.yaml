@@ -1,4 +1,0 @@
-interface:
-  display_name: "Turbo Constitution"
-  short_description: "Crie ou evolua a constitution socraticamente"
-  default_prompt: "Use $turbo-constitution para revisar princípios."

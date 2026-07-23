@@ -1,4 +1,0 @@
-interface:
-  display_name: "Turbo Status"
-  short_description: "Mostre estado e próxima ação Turbo"
-  default_prompt: "Use $turbo-status para verificar o trabalho atual."

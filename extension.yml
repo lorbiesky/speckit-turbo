@@ -1,0 +1,36 @@
+schema_version: "1.0"
+
+extension:
+  id: turbo
+  name: "Spec Kit Turbo"
+  version: "2.0.0"
+  description: "SDD and TDD guidance, visual specifications, and human gates for GitHub Spec Kit."
+  author: "lorbiesky"
+  repository: "https://github.com/lorbiesky/speckit-turbo"
+  homepage: "https://github.com/lorbiesky/speckit-turbo"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=0.11.4"
+
+provides:
+  commands:
+    - { name: speckit.turbo.start, file: commands/speckit.turbo.start.md, description: "Classify a request and begin or resume a Turbo workflow" }
+    - { name: speckit.turbo.feature, file: commands/speckit.turbo.feature.md, description: "Guide a feature through SDD, optional visual analysis, TDD, and gates" }
+    - { name: speckit.turbo.bugfix, file: commands/speckit.turbo.bugfix.md, description: "Guide a bugfix with reproduction, root cause, and regression evidence" }
+    - { name: speckit.turbo.refactor, file: commands/speckit.turbo.refactor.md, description: "Guide a behavior-preserving refactor" }
+    - { name: speckit.turbo.maintenance, file: commands/speckit.turbo.maintenance.md, description: "Guide a bounded maintenance change" }
+    - { name: speckit.turbo.hotfix, file: commands/speckit.turbo.hotfix.md, description: "Guide an urgent fix with explicit risk controls" }
+    - { name: speckit.turbo.discovery, file: commands/speckit.turbo.discovery.md, description: "Explore a problem without committing to implementation" }
+    - { name: speckit.turbo.constitution, file: commands/speckit.turbo.constitution.md, description: "Facilitate a Socratic constitution creation or update" }
+    - { name: speckit.turbo.status, file: commands/speckit.turbo.status.md, description: "Explain native workflow status and the next action" }
+    - { name: speckit.turbo.resume, file: commands/speckit.turbo.resume.md, description: "Resume a paused Turbo workflow after the required decision" }
+    - { name: speckit.turbo.tdd, file: commands/speckit.turbo.tdd.md, description: "Apply or document a TDD cycle and approved exceptions" }
+    - { name: speckit.turbo.visual, file: commands/speckit.turbo.visual.md, description: "Turn attached screenshots into an auditable visual specification" }
+  config:
+    - name: turbo-config.yml
+      template: turbo-config.yml
+      description: "Turbo quality gates, TDD, visual reference, and checkpoint policy"
+      required: false
+
+tags: ["sdd", "tdd", "workflow", "quality"]
