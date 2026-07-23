@@ -24,16 +24,16 @@ Adicione os catálogos do Turbo ao projeto e instale o bundle. Isso é seguro ta
 Linux/macOS, sem clonar este repositório:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3/scripts/install-turbo.sh | sh -s -- .
+curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.4/scripts/install-turbo.sh | sh -s -- .
 ```
 
 Windows PowerShell:
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3/scripts/Install-Turbo.ps1)))
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.4/scripts/Install-Turbo.ps1)))
 ```
 
-Para outro diretório, use `sh -s -- ./meu-projeto` no shell ou execute `& ([scriptblock]::Create((irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3/scripts/Install-Turbo.ps1))) -ProjectRoot .\meu-projeto`. O bootstrap usa o Specify CLI e não instala Node, npm ou um runtime próprio.
+Para outro diretório, use `sh -s -- ./meu-projeto` no shell ou execute `& ([scriptblock]::Create((irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.4/scripts/Install-Turbo.ps1))) -ProjectRoot .\meu-projeto`. O bootstrap usa o Specify CLI e não instala Node, npm ou um runtime próprio.
 
 O instalador registra ou atualiza os três catálogos, reinstala os sete workflows gerenciados sem prompt, atualiza a extensão Turbo e instala o bundle. Ele também migra URLs de catálogos Turbo de releases anteriores para a versão atual. Não use `specify workflow update` durante essa operação: esse comando pede confirmação interativa.
 
@@ -67,7 +67,7 @@ Os workflows instalados podem também ser iniciados ou retomados com `specify wo
 - SDD: problema, escopo e aceitação antes do plano e da implementação.
 - TDD configurável: novos projetos têm `tdd.enabled: true`; red → green → refactor é registrado, e exceções exigem justificativa, validação alternativa e aprovação quando configurada.
 - Visual specs: screenshots anexados produzem `visual-spec.md` e critérios `VAC-*`, classificados como observado, inferido ou desconhecido.
-- Constitution socrática: entrevista adaptativa, draft e aprovação humana antes de modificar `.specify/memory/constitution.md`.
+- Constitution socrática: entrevista adaptativa focada apenas em princípios duradouros, draft e aprovação humana antes de modificar `.specify/memory/constitution.md`.
 - Gates e retomada nativos: decisões e pausas usam workflows do Spec Kit, não um `state.json` paralelo.
 
 Configure somente a extensão em `.specify/extensions/turbo/turbo-config.yml`. Veja [configuração](docs/configuration.md), [constitution](docs/constitution.md) e [arquitetura](docs/architecture.md).

@@ -17,3 +17,12 @@ visual:
   references_path: .specify/visual-references
   require_visual_acceptance: true
   visual_regression: false
+
+constitution:
+  enabled: true
+  require_human_approval: true
+  question_format: single_choice_with_free_text
+  option_count: 3
+  show_recommendation: true
+  adaptive_follow_up: true
+  require_constitutional_scope: true

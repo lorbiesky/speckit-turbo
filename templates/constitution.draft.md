@@ -6,11 +6,13 @@
 
 ### [Principle title]
 
+- Constitutional scope confirmed: yes
 - Statement:
 - Rationale:
 - Observable practice:
 - Validation criterion:
-- Scope:
+- Limits and auditable exceptions:
+- Source question:
 
 ## Governance
 
@@ -19,3 +21,6 @@
 - How this constitution is reviewed and evolved:
 
 ## Open decisions
+
+Only constitutional decisions may remain here. Operational decisions belong in the linked
+specification, technical plan, task list, visual spec, or project configuration.

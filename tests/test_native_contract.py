@@ -56,6 +56,32 @@ class NativeBundleContractTests(unittest.TestCase):
         for token in prohibited:
             self.assertNotIn(token, text, token)
 
+    def test_constitution_questions_are_scope_restricted(self):
+        command = (ROOT / "commands/speckit.turbo.constitution.md").read_text().lower()
+        for term in (
+            "not_constitutional",
+            "three contextual policy alternatives",
+            "free-text",
+            "normalized principle",
+            "observable practice",
+            "validation criterion",
+        ):
+            self.assertIn(term, command)
+
+        config = yaml.safe_load((ROOT / "turbo-config.yml").read_text())["constitution"]
+        self.assertEqual(config["question_format"], "single_choice_with_free_text")
+        self.assertEqual(config["option_count"], 3)
+        self.assertTrue(config["require_constitutional_scope"])
+
+    def test_constitution_artifacts_exclude_operational_candidates(self):
+        interview = (ROOT / "templates/constitution-interview.md").read_text().lower()
+        draft = (ROOT / "templates/constitution.draft.md").read_text().lower()
+        self.assertIn("candidates discarded as operational", interview)
+        self.assertIn("routing, if rejected as operational", interview)
+        self.assertIn("constitutional scope confirmed", draft)
+        self.assertIn("observable practice", draft)
+        self.assertIn("validation criterion", draft)
+
 
 if __name__ == "__main__":
     unittest.main()

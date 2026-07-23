@@ -7,13 +7,13 @@ O bootstrap oficial baixa somente um script pequeno do GitHub Raw e usa o Specif
 Linux/macOS:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3/scripts/install-turbo.sh | sh -s -- .
+curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.4/scripts/install-turbo.sh | sh -s -- .
 ```
 
 Windows PowerShell:
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3/scripts/Install-Turbo.ps1)))
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.4/scripts/Install-Turbo.ps1)))
 ```
 
 O diretório atual é o padrão. Para outro diretório, use `sh -s -- ./meu-projeto` ou execute o script PowerShell baixado com `-ProjectRoot .\meu-projeto`. O instalador é idempotente e apenas encadeia comandos oficiais do Spec Kit.
@@ -26,7 +26,7 @@ Inicialize o projeto com o fluxo oficial do Spec Kit e a integração desejada. 
 
 ```bash
 specify init --here --integration codex
-curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3/scripts/install-turbo.sh | sh -s -- .
+curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.4/scripts/install-turbo.sh | sh -s -- .
 ```
 
 O instalador registra a extensão `turbo`, os sete workflows `turbo-*` e o bundle. A configuração é criada em `.specify/extensions/turbo/turbo-config.yml`; os assets upstream permanecem sob controle do Spec Kit.
@@ -41,7 +41,7 @@ Primeiro atualize o Spec Kit. Depois, execute novamente o instalador da release 
 
 ```bash
 specify self upgrade
-curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3/scripts/install-turbo.sh | sh -s -- .
+curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.4/scripts/install-turbo.sh | sh -s -- .
 ```
 
 O identificador correto do bundle é `speckit-turbo`; nomes como `speckit-turboclear` não existem no catálogo. Não execute `specify workflow update` no bootstrap automatizado: o comando é interativo.
@@ -52,7 +52,7 @@ Atualize primeiro o próprio Spec Kit e então execute novamente o instalador da
 
 ```bash
 specify self upgrade
-curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3/scripts/install-turbo.sh | sh -s -- .
+curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.4/scripts/install-turbo.sh | sh -s -- .
 ```
 
 Revise os release notes antes de atualizar. A configuração local da extensão não deve ser apagada por uma atualização.

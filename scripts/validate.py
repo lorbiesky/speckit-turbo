@@ -24,6 +24,15 @@ WORKFLOWS = {
 IMPLEMENTATION_WORKFLOWS = WORKFLOWS - {"turbo-discovery", "turbo-constitution"}
 PUBLIC_DOCS = [ROOT / "README.md", *(ROOT / "docs").glob("*.md")]
 FORBIDDEN_PUBLIC_TERMS = ("npx speckit-turbo", "$turbo-", "node .specify/turbo")
+CONSTITUTION_CONFIG = {
+    "enabled": bool,
+    "require_human_approval": bool,
+    "question_format": str,
+    "option_count": int,
+    "show_recommendation": bool,
+    "adaptive_follow_up": bool,
+    "require_constitutional_scope": bool,
+}
 
 
 def load_yaml(path: Path) -> dict:
@@ -56,6 +65,59 @@ def validate_extension(errors: list[str]) -> None:
     config = data.get("provides", {}).get("config", [])
     if not any(item.get("name") == "turbo-config.yml" and (ROOT / item.get("template", "")).is_file() for item in config):
         fail(errors, "extension must expose the Turbo configuration template")
+
+
+def validate_constitution_contract(errors: list[str]) -> None:
+    command = (ROOT / "commands/speckit.turbo.constitution.md").read_text(encoding="utf-8").lower()
+    required_command_terms = (
+        "constitutional",
+        "not_constitutional",
+        "one evidence-based constitutional decision at a time",
+        "three contextual policy alternatives",
+        "recommendation",
+        "free-text",
+        "normalized principle",
+        "observable practice",
+        "validation criterion",
+        "do not alter `.specify/memory/constitution.md`",
+    )
+    for term in required_command_terms:
+        if term not in command:
+            fail(errors, f"constitution command is missing scope rule: {term}")
+
+    config = load_yaml(ROOT / "turbo-config.yml").get("constitution", {})
+    if set(config) != set(CONSTITUTION_CONFIG):
+        fail(errors, "turbo-config.yml constitution settings must match the structured question contract")
+    for key, expected_type in CONSTITUTION_CONFIG.items():
+        if key in config and not isinstance(config[key], expected_type):
+            fail(errors, f"constitution config {key} must be {expected_type.__name__}")
+    if config.get("question_format") != "single_choice_with_free_text":
+        fail(errors, "constitution question_format must default to single_choice_with_free_text")
+    if config.get("option_count") != 3:
+        fail(errors, "constitution option_count must default to 3")
+    if config.get("require_constitutional_scope") is not True:
+        fail(errors, "constitution scope protection must be enabled by default")
+
+    interview = (ROOT / "templates/constitution-interview.md").read_text(encoding="utf-8").lower()
+    for term in (
+        "candidate classification",
+        "candidates discarded as operational",
+        "constitutional principle under evaluation",
+        "policy options presented",
+        "recommended option",
+        "free-text answer",
+        "normalized principle",
+        "observable practice",
+        "validation criterion",
+        "routing, if rejected as operational",
+    ):
+        if term not in interview:
+            fail(errors, f"constitution interview template is missing: {term}")
+
+    draft = (ROOT / "templates/constitution.draft.md").read_text(encoding="utf-8").lower()
+    for term in ("constitutional scope confirmed", "observable practice", "validation criterion", "limits and auditable exceptions"):
+        if term not in draft:
+            fail(errors, f"constitution draft template is missing: {term}")
 
 
 def validate_workflows(errors: list[str]) -> None:
@@ -156,6 +218,7 @@ def main() -> int:
     if not re.fullmatch(r"\d+\.\d+\.\d+", VERSION):
         fail(errors, "VERSION must be semantic version X.Y.Z")
     validate_extension(errors)
+    validate_constitution_contract(errors)
     validate_workflows(errors)
     validate_bundle_and_catalogs(errors)
     validate_docs(errors)

@@ -2,12 +2,12 @@ schema_version: "1.0"
 workflow:
   id: turbo-constitution
   name: "Turbo Constitution"
-  version: "2.0.3"
+  version: "2.0.4"
   author: lorbiesky
-  description: "Socratic constitution creation or update with a draft and mandatory human approval."
+  description: "Socratic constitution creation or update restricted to durable, normative principles with structured questions and mandatory human approval."
 requires: { speckit_version: ">=0.11.4" }
 inputs:
-  request: { type: string, required: true, prompt: "Create or update the engineering constitution" }
+  request: { type: string, required: true, prompt: "Create or update only durable engineering principles in the project constitution" }
   integration: { type: string, default: auto }
 steps:
   - { id: interview, command: speckit.turbo.constitution, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }

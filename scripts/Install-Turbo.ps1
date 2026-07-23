@@ -3,7 +3,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$repositoryRoot = "https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3"
+$repositoryRoot = "https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.4"
 $extensionCatalog = "$repositoryRoot/catalogs/extensions.json"
 $workflowCatalog = "$repositoryRoot/catalogs/workflows.json"
 $bundleCatalog = "$repositoryRoot/catalogs/bundles.json"

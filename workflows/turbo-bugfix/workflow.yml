@@ -2,7 +2,7 @@ schema_version: "1.0"
 workflow:
   id: turbo-bugfix
   name: "Turbo Bugfix"
-  version: "2.0.3"
+  version: "2.0.4"
   author: lorbiesky
   description: "Bugfix with reproduction, root cause, regression evidence, and configurable TDD."
 requires: { speckit_version: ">=0.11.4" }

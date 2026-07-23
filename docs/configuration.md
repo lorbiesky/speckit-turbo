@@ -21,6 +21,15 @@ visual:
   references_path: .specify/visual-references
   require_visual_acceptance: true
   visual_regression: false
+
+constitution:
+  enabled: true
+  require_human_approval: true
+  question_format: single_choice_with_free_text
+  option_count: 3
+  show_recommendation: true
+  adaptive_follow_up: true
+  require_constitutional_scope: true
 ```
 
 ## TDD
@@ -33,6 +42,19 @@ tdd:
 ```
 
 Uma exceção com TDD ativo não é desativação: o agente registra justificativa, risco e validação alternativa em `tdd-cycle.md`, então pausa para aprovação humana quando a política exigir.
+
+## Entrevista da constitution
+
+O fluxo `$speckit-turbo-constitution` pergunta somente sobre princípios duradouros,
+normativos e aplicáveis a várias entregas. Ele não transforma decisões de uma feature,
+bibliotecas, nomes de arquivos, detalhes visuais isolados ou configurações temporárias em
+regras constitucionais.
+
+Cada pergunta apresenta uma política constitucional por vez, três alternativas baseadas
+nas evidências do repositório, uma recomendação e uma opção de resposta livre. A resposta
+livre passa pela mesma validação de escopo. Candidatos operacionais são descartados e
+encaminhados para spec, plano técnico, tarefa, visual spec ou configuração; eles não entram
+no draft.
 
 ## Screenshots e referências visuais
 
