@@ -7,13 +7,13 @@ O bootstrap oficial baixa somente um script pequeno do GitHub Raw e usa o Specif
 Linux/macOS:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/scripts/install-turbo.sh | sh -s -- .
+curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.1/scripts/install-turbo.sh | sh -s -- .
 ```
 
 Windows PowerShell:
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/scripts/Install-Turbo.ps1)))
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.1/scripts/Install-Turbo.ps1)))
 ```
 
 O diretório atual é o padrão. Para outro diretório, use `sh -s -- ./meu-projeto` ou execute o script PowerShell baixado com `-ProjectRoot .\meu-projeto`. O instalador é idempotente e apenas encadeia comandos oficiais do Spec Kit.
@@ -53,7 +53,7 @@ Isso significa que o bundle tentou delegar a instalação de um workflow antes q
 specify bundle install speckit-turbo
 ```
 
-Se aparecer `HTTP Error 404` para `speckit-turbo-bundle-2.0.0.zip`, atualize os catálogos e confirme que o Spec Kit é `>=0.11.4`:
+Se aparecer `HTTP Error 404` para `speckit-turbo-bundle-2.0.1.zip`, atualize os catálogos e confirme que o Spec Kit é `>=0.11.4`:
 
 ```bash
 specify self upgrade

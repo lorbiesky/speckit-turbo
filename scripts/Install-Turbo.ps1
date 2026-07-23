@@ -3,12 +3,10 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$extensionPattern = [regex]::Escape($extensionCatalog)
-$workflowPattern = [regex]::Escape($workflowCatalog)
-$bundlePattern = [regex]::Escape($bundleCatalog)
-$extensionCatalog = "https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/extensions.json"
-$workflowCatalog = "https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/workflows.json"
-$bundleCatalog = "https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/bundles.json"
+$repositoryRoot = "https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.1"
+$extensionCatalog = "$repositoryRoot/catalogs/extensions.json"
+$workflowCatalog = "$repositoryRoot/catalogs/workflows.json"
+$bundleCatalog = "$repositoryRoot/catalogs/bundles.json"
 $specify = Get-Command specify -ErrorAction SilentlyContinue
 
 if (-not $specify) {
@@ -25,13 +23,13 @@ try {
     $extensionConfig = ".specify/extension-catalogs.yml"
     $workflowConfig = ".specify/workflow-catalogs.yml"
     $bundleConfig = ".specify/bundle-catalogs.yml"
-    if (-not (Test-Path $extensionConfig) -or -not (Select-String -Path $extensionConfig -Pattern $extensionPattern -Quiet)) {
+    if (-not (Test-Path $extensionConfig) -or -not ((Get-Content -Raw $extensionConfig).Contains($extensionCatalog))) {
         & specify extension catalog add $extensionCatalog --name speckit-turbo --install-allowed
     }
-    if (-not (Test-Path $workflowConfig) -or -not (Select-String -Path $workflowConfig -Pattern $workflowPattern -Quiet)) {
+    if (-not (Test-Path $workflowConfig) -or -not ((Get-Content -Raw $workflowConfig).Contains($workflowCatalog))) {
         & specify workflow catalog add $workflowCatalog --name speckit-turbo
     }
-    if (-not (Test-Path $bundleConfig) -or -not (Select-String -Path $bundleConfig -Pattern $bundlePattern -Quiet)) {
+    if (-not (Test-Path $bundleConfig) -or -not ((Get-Content -Raw $bundleConfig).Contains($bundleCatalog))) {
         & specify bundle catalog add $bundleCatalog --id speckit-turbo --policy install-allowed
     }
 

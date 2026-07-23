@@ -2,7 +2,7 @@ schema_version: "1.0"
 workflow:
   id: turbo-constitution
   name: "Turbo Constitution"
-  version: "2.0.0"
+  version: "2.0.1"
   author: lorbiesky
   description: "Socratic constitution creation or update with a draft and mandatory human approval."
 requires: { speckit_version: ">=0.11.4" }

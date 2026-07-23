@@ -3,7 +3,7 @@ schema_version: "1.0"
 extension:
   id: turbo
   name: "Spec Kit Turbo"
-  version: "2.0.0"
+  version: "2.0.1"
   description: "SDD and TDD guidance, visual specifications, and human gates for GitHub Spec Kit."
   author: "lorbiesky"
   repository: "https://github.com/lorbiesky/speckit-turbo"

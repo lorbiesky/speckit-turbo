@@ -16,7 +16,10 @@ class InstallerContractTests(unittest.TestCase):
     def test_powershell_installer_exists(self):
         installer = ROOT / "scripts/Install-Turbo.ps1"
         self.assertTrue(installer.is_file())
-        self.assertIn("specify bundle install speckit-turbo", installer.read_text())
+        text = installer.read_text()
+        self.assertIn("specify bundle install speckit-turbo", text)
+        self.assertIn("Get-Content -Raw", text)
+        self.assertNotIn("Select-String", text)
 
 
 if __name__ == "__main__":

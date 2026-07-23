@@ -2,7 +2,7 @@ schema_version: "1.0"
 workflow:
   id: turbo-hotfix
   name: "Turbo Hotfix"
-  version: "2.0.0"
+  version: "2.0.1"
   author: lorbiesky
   description: "Urgent fix with explicit impact, rollback, risk, and delivery gate."
 requires: { speckit_version: ">=0.11.4" }

@@ -4,7 +4,7 @@
 # resolution and installation to the native Specify CLI.
 set -eu
 
-REPOSITORY_ROOT="https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main"
+REPOSITORY_ROOT="https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.1"
 EXTENSION_CATALOG="$REPOSITORY_ROOT/catalogs/extensions.json"
 WORKFLOW_CATALOG="$REPOSITORY_ROOT/catalogs/workflows.json"
 BUNDLE_CATALOG="$REPOSITORY_ROOT/catalogs/bundles.json"
