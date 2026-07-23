@@ -3,6 +3,7 @@ name: Release native Spec Kit Turbo assets
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -23,12 +24,12 @@ jobs:
         run: |
           mkdir -p dist
           version="$(tr -d '\n' < VERSION)"
-          git archive --format=zip --prefix=turbo/ HEAD extension.yml turbo-config.yml commands templates scripts > "dist/speckit-turbo-extension-${version}.zip"
+          git archive --format=zip HEAD extension.yml turbo-config.yml commands templates scripts > "dist/speckit-turbo-extension-${version}.zip"
           for workflow in workflows/*; do
             id="$(basename "$workflow")"
-            git archive --format=zip --prefix="${id}/" HEAD "$workflow" > "dist/${id}-${version}.zip"
+            git archive --format=zip HEAD "$workflow" > "dist/${id}-${version}.zip"
           done
-          git archive --format=zip --prefix=speckit-turbo/ HEAD bundle.yml VERSION > "dist/speckit-turbo-bundle-${version}.zip"
+          git archive --format=zip HEAD bundle.yml VERSION > "dist/speckit-turbo-bundle-${version}.zip"
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
