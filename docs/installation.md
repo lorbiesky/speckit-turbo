@@ -25,6 +25,22 @@ O bundle instala a extensão `turbo` e registra a composição dos sete workflow
 
 Execute os comandos de catálogo, instale os sete workflows com `specify workflow add` e finalize com `specify bundle install speckit-turbo`. A instalação é composicional: não altera `.specify/memory/constitution.md`, templates, scripts, comandos ou workflows já presentes. Se um componente tiver o mesmo id, o Spec Kit mostrará o conflito em vez de sobrescrevê-lo silenciosamente.
 
+### Se aparecer `--dev source must be a workflow YAML`
+
+Isso significa que o bundle tentou delegar a instalação de um workflow antes que ele estivesse instalado. Não use `--dev` para corrigir essa mensagem. Execute os sete comandos de workflow da seção anterior e repita:
+
+```bash
+specify bundle install speckit-turbo
+```
+
+Se aparecer `HTTP Error 404` para `speckit-turbo-bundle-2.0.0.zip`, atualize os catálogos e confirme que o Spec Kit é `>=0.11.4`:
+
+```bash
+specify self upgrade
+specify bundle catalog remove speckit-turbo
+specify bundle catalog add https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/bundles.json --id speckit-turbo --policy install-allowed
+```
+
 ## Atualização
 
 Atualize primeiro o próprio Spec Kit e então os componentes instalados:

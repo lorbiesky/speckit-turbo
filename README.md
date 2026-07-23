@@ -37,6 +37,8 @@ specify bundle install speckit-turbo
 
 Os workflows são adicionados explicitamente antes do bundle para manter compatibilidade com versões do Specify CLI que delegam incorretamente a instalação de workflows de catálogo durante `bundle install`. A operação é idempotente; se já estiverem instalados, o Spec Kit apenas os reutiliza.
 
+Se o Specify mostrar `--dev source must be a workflow YAML`, os sete comandos `specify workflow add` ainda não foram executados. Se mostrar `HTTP Error 404` para o bundle, atualize o Spec Kit e recarregue o catálogo; o asset oficial `v2.0.0` está publicado no GitHub Releases.
+
 Consulte os componentes instalados com `specify extension list`, `specify workflow list` e `specify bundle list`. Para instruções completas, inclusive projeto novo, atualização e remoção, leia [o guia de instalação](docs/installation.md). Instalações legadas têm um [guia de migração seguro](docs/migration-npm.md).
 
 ## Uso no Codex
