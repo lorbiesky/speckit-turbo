@@ -9,14 +9,21 @@ specify init --here --integration codex
 specify extension catalog add https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/extensions.json --name speckit-turbo --install-allowed
 specify workflow catalog add https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/workflows.json
 specify bundle catalog add https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/bundles.json --id speckit-turbo --policy install-allowed
+specify workflow add turbo-feature
+specify workflow add turbo-bugfix
+specify workflow add turbo-refactor
+specify workflow add turbo-maintenance
+specify workflow add turbo-hotfix
+specify workflow add turbo-discovery
+specify workflow add turbo-constitution
 specify bundle install speckit-turbo
 ```
 
-O bundle instala a extensão `turbo` e os sete workflows `turbo-*`. A configuração opcional é criada em `.specify/extensions/turbo/turbo-config.yml` pela extensão; os assets upstream permanecem sob controle do Spec Kit.
+O bundle instala a extensão `turbo` e registra a composição dos sete workflows `turbo-*`; os sete comandos `specify workflow add` garantem a instalação dos workflows pelo caminho nativo compatível. A configuração é criada em `.specify/extensions/turbo/turbo-config.yml`; os assets upstream permanecem sob controle do Spec Kit.
 
 ## Projeto Spec Kit existente
 
-Execute somente os três comandos de catálogo e `specify bundle install speckit-turbo`. A instalação é composicional: não altera `.specify/memory/constitution.md`, templates, scripts, comandos ou workflows já presentes. Se um componente tiver o mesmo id, o Spec Kit mostrará o conflito em vez de sobrescrevê-lo silenciosamente.
+Execute os comandos de catálogo, instale os sete workflows com `specify workflow add` e finalize com `specify bundle install speckit-turbo`. A instalação é composicional: não altera `.specify/memory/constitution.md`, templates, scripts, comandos ou workflows já presentes. Se um componente tiver o mesmo id, o Spec Kit mostrará o conflito em vez de sobrescrevê-lo silenciosamente.
 
 ## Atualização
 

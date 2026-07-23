@@ -25,8 +25,17 @@ Adicione os catálogos do Turbo ao projeto e instale o bundle. Isso é seguro ta
 specify extension catalog add https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/extensions.json --name speckit-turbo --install-allowed
 specify workflow catalog add https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/workflows.json
 specify bundle catalog add https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/bundles.json --id speckit-turbo --policy install-allowed
+specify workflow add turbo-feature
+specify workflow add turbo-bugfix
+specify workflow add turbo-refactor
+specify workflow add turbo-maintenance
+specify workflow add turbo-hotfix
+specify workflow add turbo-discovery
+specify workflow add turbo-constitution
 specify bundle install speckit-turbo
 ```
+
+Os workflows são adicionados explicitamente antes do bundle para manter compatibilidade com versões do Specify CLI que delegam incorretamente a instalação de workflows de catálogo durante `bundle install`. A operação é idempotente; se já estiverem instalados, o Spec Kit apenas os reutiliza.
 
 Consulte os componentes instalados com `specify extension list`, `specify workflow list` e `specify bundle list`. Para instruções completas, inclusive projeto novo, atualização e remoção, leia [o guia de instalação](docs/installation.md). Instalações legadas têm um [guia de migração seguro](docs/migration-npm.md).
 
