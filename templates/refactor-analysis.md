@@ -23,7 +23,7 @@ Describe the desired boundaries and why they improve the current design.
 
 ## Explicit non-goals
 
-- 
+-
 
 ## Regression baseline
 
@@ -33,9 +33,9 @@ Describe the desired boundaries and why they improve the current design.
 
 ## Incremental migration
 
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 Each step should leave the repository buildable and reviewable.
 
@@ -47,7 +47,7 @@ Each step should leave the repository buildable and reviewable.
 
 ## Rollback points
 
-- 
+-
 
 ## Completion evidence
 

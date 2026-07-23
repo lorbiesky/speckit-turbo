@@ -19,4 +19,3 @@
 - How this constitution is reviewed and evolved:
 
 ## Open decisions
-
