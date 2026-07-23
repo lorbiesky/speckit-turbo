@@ -15,11 +15,11 @@ Describe the delivered behavior and the user or developer impact.
 
 ### Included
 
-- 
+-
 
 ### Excluded
 
-- 
+-
 
 ## Implementation
 
@@ -50,11 +50,11 @@ For every acceptance criterion and quality gate, record the evidence type, refer
 
 ## Risks and limitations
 
-- 
+-
 
 ## Follow-ups
 
-- 
+-
 
 ## Rollback or recovery
 
