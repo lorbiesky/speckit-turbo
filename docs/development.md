@@ -8,6 +8,7 @@
 - `bundle.yml`: composição versionada.
 - `catalogs/`: índices para os assets do GitHub Releases.
 - `VERSION`: fonte única de versão.
+- `scripts/install-turbo.sh` e `scripts/Install-Turbo.ps1`: conveniências de instalação que apenas encadeiam o Specify CLI.
 
 ## Validação local
 

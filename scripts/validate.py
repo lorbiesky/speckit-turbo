@@ -121,6 +121,22 @@ def validate_docs(errors: list[str]) -> None:
     for command in ("specify extension", "specify workflow", "specify bundle", "specify self upgrade"):
         if command not in text:
             fail(errors, f"public documentation does not explain {command}")
+    if "install-turbo.sh" not in text or "install-turbo.ps1" not in text:
+        fail(errors, "public documentation must expose the one-command installer")
+
+
+def validate_installers(errors: list[str]) -> None:
+    shell_installer = ROOT / "scripts" / "install-turbo.sh"
+    powershell_installer = ROOT / "scripts" / "Install-Turbo.ps1"
+    if not shell_installer.is_file() or not powershell_installer.is_file():
+        fail(errors, "both one-command installers must exist")
+    if shell_installer.is_file():
+        text = shell_installer.read_text(encoding="utf-8")
+        for catalog in ("extensions.json", "workflows.json", "bundles.json"):
+            if catalog not in text:
+                fail(errors, f"shell installer does not reference {catalog}")
+        if "git clone" in text or "node_modules" in text:
+            fail(errors, "shell installer must not clone or install a Node runtime")
 
 
 def main() -> int:
@@ -131,6 +147,7 @@ def main() -> int:
     validate_workflows(errors)
     validate_bundle_and_catalogs(errors)
     validate_docs(errors)
+    validate_installers(errors)
     if errors:
         print("Native Spec Kit Turbo validation failed:")
         print("\n".join(f"- {error}" for error in errors))

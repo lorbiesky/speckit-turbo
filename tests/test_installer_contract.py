@@ -1,0 +1,23 @@
+import unittest
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+class InstallerContractTests(unittest.TestCase):
+    def test_shell_installer_is_a_native_bootstrap(self):
+        installer = (ROOT / "scripts/install-turbo.sh").read_text()
+        self.assertIn('workflow add', installer)
+        self.assertIn('bundle install speckit-turbo', installer)
+        self.assertNotIn("git clone", installer)
+        self.assertNotIn("node_modules", installer)
+
+    def test_powershell_installer_exists(self):
+        installer = ROOT / "scripts/Install-Turbo.ps1"
+        self.assertTrue(installer.is_file())
+        self.assertIn("specify bundle install speckit-turbo", installer.read_text())
+
+
+if __name__ == "__main__":
+    unittest.main()

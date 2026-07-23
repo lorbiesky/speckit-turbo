@@ -21,6 +21,20 @@ specify version
 
 Adicione os catálogos do Turbo ao projeto e instale o bundle. Isso é seguro tanto para um projeto novo quanto para um projeto que já usa Spec Kit: o Turbo não substitui constitution, templates, comandos ou workflows upstream.
 
+Linux/macOS, sem clonar este repositório:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/scripts/install-turbo.sh | sh -s -- .
+```
+
+Windows PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/scripts/Install-Turbo.ps1 | iex
+```
+
+Para outro diretório, use `sh -s -- ./meu-projeto` no shell ou baixe o script PowerShell e execute `-ProjectRoot .\meu-projeto`. O bootstrap usa o Specify CLI e não instala Node, npm ou um runtime próprio.
+
 ```bash
 specify extension catalog add https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/extensions.json --name speckit-turbo --install-allowed
 specify workflow catalog add https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/workflows.json

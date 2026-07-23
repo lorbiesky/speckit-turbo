@@ -1,5 +1,23 @@
 # Instalação, atualização e remoção
 
+## Instalação com um comando
+
+O bootstrap oficial baixa somente um script pequeno do GitHub Raw e usa o Specify CLI local. Este repositório não é clonado.
+
+Linux/macOS:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/scripts/install-turbo.sh | sh -s -- .
+```
+
+Windows PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/scripts/Install-Turbo.ps1 | iex
+```
+
+O diretório atual é o padrão. Para outro diretório, use `sh -s -- ./meu-projeto` ou execute o script PowerShell baixado com `-ProjectRoot .\meu-projeto`. O instalador é idempotente e apenas encadeia comandos oficiais do Spec Kit.
+
 ## Projeto novo
 
 Inicialize o projeto com o fluxo oficial do Spec Kit e a integração desejada. Em seguida adicione os catálogos e instale o bundle Turbo:
