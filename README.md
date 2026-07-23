@@ -30,10 +30,10 @@ curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/script
 Windows PowerShell:
 
 ```powershell
-irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/scripts/Install-Turbo.ps1 | iex
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/scripts/Install-Turbo.ps1)))
 ```
 
-Para outro diretório, use `sh -s -- ./meu-projeto` no shell ou baixe o script PowerShell e execute `-ProjectRoot .\meu-projeto`. O bootstrap usa o Specify CLI e não instala Node, npm ou um runtime próprio.
+Para outro diretório, use `sh -s -- ./meu-projeto` no shell ou execute `& ([scriptblock]::Create((irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/scripts/Install-Turbo.ps1))) -ProjectRoot .\meu-projeto`. O bootstrap usa o Specify CLI e não instala Node, npm ou um runtime próprio.
 
 ```bash
 specify extension catalog add https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/extensions.json --name speckit-turbo --install-allowed

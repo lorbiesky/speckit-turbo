@@ -13,10 +13,12 @@ curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/script
 Windows PowerShell:
 
 ```powershell
-irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/scripts/Install-Turbo.ps1 | iex
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/scripts/Install-Turbo.ps1)))
 ```
 
 O diretório atual é o padrão. Para outro diretório, use `sh -s -- ./meu-projeto` ou execute o script PowerShell baixado com `-ProjectRoot .\meu-projeto`. O instalador é idempotente e apenas encadeia comandos oficiais do Spec Kit.
+
+No PowerShell, use `ScriptBlock` como mostrado acima; isso evita que o pipeline `irm | iex` interprete linhas do script remoto como argumentos separados.
 
 ## Projeto novo
 
@@ -58,6 +60,8 @@ specify self upgrade
 specify bundle catalog remove speckit-turbo
 specify bundle catalog add https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/bundles.json --id speckit-turbo --policy install-allowed
 ```
+
+O identificador correto do bundle é `speckit-turbo`; nomes como `speckit-turboclear` não existem no catálogo.
 
 ## Atualização
 

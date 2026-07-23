@@ -3,6 +3,9 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$extensionPattern = [regex]::Escape($extensionCatalog)
+$workflowPattern = [regex]::Escape($workflowCatalog)
+$bundlePattern = [regex]::Escape($bundleCatalog)
 $extensionCatalog = "https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/extensions.json"
 $workflowCatalog = "https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/workflows.json"
 $bundleCatalog = "https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/bundles.json"
@@ -22,13 +25,13 @@ try {
     $extensionConfig = ".specify/extension-catalogs.yml"
     $workflowConfig = ".specify/workflow-catalogs.yml"
     $bundleConfig = ".specify/bundle-catalogs.yml"
-    if (-not (Test-Path $extensionConfig) -or -not (Select-String -Path $extensionConfig -Pattern [regex]::Escape($extensionCatalog) -Quiet)) {
+    if (-not (Test-Path $extensionConfig) -or -not (Select-String -Path $extensionConfig -Pattern $extensionPattern -Quiet)) {
         & specify extension catalog add $extensionCatalog --name speckit-turbo --install-allowed
     }
-    if (-not (Test-Path $workflowConfig) -or -not (Select-String -Path $workflowConfig -Pattern [regex]::Escape($workflowCatalog) -Quiet)) {
+    if (-not (Test-Path $workflowConfig) -or -not (Select-String -Path $workflowConfig -Pattern $workflowPattern -Quiet)) {
         & specify workflow catalog add $workflowCatalog --name speckit-turbo
     }
-    if (-not (Test-Path $bundleConfig) -or -not (Select-String -Path $bundleConfig -Pattern [regex]::Escape($bundleCatalog) -Quiet)) {
+    if (-not (Test-Path $bundleConfig) -or -not (Select-String -Path $bundleConfig -Pattern $bundlePattern -Quiet)) {
         & specify bundle catalog add $bundleCatalog --id speckit-turbo --policy install-allowed
     }
 
