@@ -1,0 +1,21 @@
+schema_version: "1.0"
+workflow:
+  id: turbo-refactor
+  name: "Turbo Refactor"
+  version: "2.0.0"
+  author: lorbiesky
+  description: "Behavior-preserving refactor with invariants, baseline, and comparison validation."
+requires: { speckit_version: ">=0.11.4" }
+inputs:
+  request: { type: string, required: true, prompt: "Describe the refactor" }
+  integration: { type: string, default: auto }
+steps:
+  - { id: intake, command: speckit.turbo.refactor, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: specify, command: speckit.specify, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: baseline-gate, type: gate, message: "Confirm invariants and baseline validation.", options: [approve, reject], on_reject: abort }
+  - { id: plan, command: speckit.plan, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: tasks, command: speckit.tasks, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: tdd, command: speckit.turbo.tdd, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: implement, command: speckit.implement, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: analyze, command: speckit.analyze, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: delivery-gate, type: gate, message: "Confirm invariant comparison and residual risks.", options: [approve, reject], on_reject: abort }

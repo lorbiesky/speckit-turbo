@@ -1,0 +1,23 @@
+schema_version: "1.0"
+workflow:
+  id: turbo-feature
+  name: "Turbo Feature"
+  version: "2.0.0"
+  author: lorbiesky
+  description: "Feature delivery with SDD, optional visual specification, configurable TDD, and human gates."
+requires:
+  speckit_version: ">=0.11.4"
+inputs:
+  request: { type: string, required: true, prompt: "Describe the feature" }
+  integration: { type: string, default: auto }
+steps:
+  - { id: intake, command: speckit.turbo.feature, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: specify, command: speckit.specify, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: specification-gate, type: gate, message: "Approve the specification and visual acceptance criteria before planning.", options: [approve, reject], on_reject: abort }
+  - { id: plan, command: speckit.plan, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: plan-gate, type: gate, message: "Approve the technical plan before task generation.", options: [approve, reject], on_reject: abort }
+  - { id: tasks, command: speckit.tasks, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: tdd, command: speckit.turbo.tdd, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: implement, command: speckit.implement, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: analyze, command: speckit.analyze, integration: "{{ inputs.integration }}", input: { args: "{{ inputs.request }}" } }
+  - { id: delivery-gate, type: gate, message: "Confirm validation evidence, residual risks, and delivery summary.", options: [approve, reject], on_reject: abort }

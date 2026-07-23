@@ -1,4 +1,0 @@
-interface:
-  display_name: "Turbo Maintenance"
-  short_description: "Inicie manutenção planejada e segura"
-  default_prompt: "Use $turbo-maintenance para esta manutenção."

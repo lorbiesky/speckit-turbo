@@ -1,4 +1,0 @@
-interface:
-  display_name: "Turbo Hotfix"
-  short_description: "Inicie um hotfix urgente auditável"
-  default_prompt: "Use $turbo-hotfix para este incidente."

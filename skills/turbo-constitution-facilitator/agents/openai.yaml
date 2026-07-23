@@ -1,4 +1,0 @@
-interface:
-  display_name: "Constitution Facilitator"
-  short_description: "Socratic constitution interviews"
-  default_prompt: "Conduct or resume a Socratic constitution interview, create a reviewed draft, and wait for approval before updating the final constitution."

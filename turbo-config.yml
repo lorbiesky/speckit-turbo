@@ -1,0 +1,19 @@
+# Default local policy for the installed Turbo extension.
+tdd:
+  enabled: true
+  allow_exception: true
+  require_human_approval_for_exception: true
+
+checkpoints:
+  require_human_approval:
+    specification: true
+    plan: true
+    constitution: true
+    tdd_exception: true
+
+visual:
+  enabled: true
+  persist_references: false
+  references_path: .specify/visual-references
+  require_visual_acceptance: true
+  visual_regression: false
