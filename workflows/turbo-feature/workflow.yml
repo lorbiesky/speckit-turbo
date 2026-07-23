@@ -2,7 +2,7 @@ schema_version: "1.0"
 workflow:
   id: turbo-feature
   name: "Turbo Feature"
-  version: "2.0.1"
+  version: "2.0.2"
   author: lorbiesky
   description: "Feature delivery with SDD, optional visual specification, configurable TDD, and human gates."
 requires:

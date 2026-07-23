@@ -3,7 +3,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$repositoryRoot = "https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.1"
+$repositoryRoot = "https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.2"
 $extensionCatalog = "$repositoryRoot/catalogs/extensions.json"
 $workflowCatalog = "$repositoryRoot/catalogs/workflows.json"
 $bundleCatalog = "$repositoryRoot/catalogs/bundles.json"
@@ -23,24 +23,37 @@ try {
     $extensionConfig = ".specify/extension-catalogs.yml"
     $workflowConfig = ".specify/workflow-catalogs.yml"
     $bundleConfig = ".specify/bundle-catalogs.yml"
-    if (-not (Test-Path $extensionConfig) -or -not ((Get-Content -Raw $extensionConfig).Contains($extensionCatalog))) {
-        & specify extension catalog add $extensionCatalog --name speckit-turbo --install-allowed
+    function Ensure-ManagedCatalog([string]$Kind, [string]$CatalogUrl, [string]$ConfigPath, [string]$CatalogFile, [string[]]$CatalogArguments) {
+        if (Test-Path $ConfigPath) {
+            $content = Get-Content -Raw $ConfigPath
+            if ($content.Contains($CatalogUrl)) { return }
+            $pattern = "https://raw\.githubusercontent\.com/lorbiesky/speckit-turbo/(main|v[^/]+)/catalogs/$([regex]::Escape($CatalogFile))"
+            if ($content -match $pattern) {
+                [System.IO.File]::WriteAllText((Resolve-Path $ConfigPath), [regex]::Replace($content, $pattern, $CatalogUrl))
+                return
+            }
+        }
+        & specify $Kind catalog add $CatalogUrl @CatalogArguments
     }
-    if (-not (Test-Path $workflowConfig) -or -not ((Get-Content -Raw $workflowConfig).Contains($workflowCatalog))) {
-        & specify workflow catalog add $workflowCatalog --name speckit-turbo
-    }
-    if (-not (Test-Path $bundleConfig) -or -not ((Get-Content -Raw $bundleConfig).Contains($bundleCatalog))) {
-        & specify bundle catalog add $bundleCatalog --id speckit-turbo --policy install-allowed
-    }
+
+    Ensure-ManagedCatalog "extension" $extensionCatalog $extensionConfig "extensions.json" @("--name", "speckit-turbo", "--install-allowed")
+    Ensure-ManagedCatalog "workflow" $workflowCatalog $workflowConfig "workflows.json" @("--name", "speckit-turbo")
+    Ensure-ManagedCatalog "bundle" $bundleCatalog $bundleConfig "bundles.json" @("--id", "speckit-turbo", "--policy", "install-allowed")
 
     $workflowIds = @("turbo-feature", "turbo-bugfix", "turbo-refactor", "turbo-maintenance", "turbo-hotfix", "turbo-discovery", "turbo-constitution")
     $installedWorkflows = (& specify workflow list 2>&1 | Out-String)
     foreach ($workflowId in $workflowIds) {
-        if ($installedWorkflows -notmatch "\($([regex]::Escape($workflowId))\)") {
+        if ($installedWorkflows -match "\($([regex]::Escape($workflowId))\)") {
+            & specify workflow update $workflowId
+        }
+        else {
             & specify workflow add $workflowId
         }
     }
 
+    if ((& specify extension list 2>&1 | Out-String) -match "turbo") {
+        & specify extension update turbo
+    }
     & specify bundle install speckit-turbo
     if ((& specify extension list 2>&1 | Out-String) -notmatch "turbo") {
         throw "Spec Kit Turbo was not registered after installation."
