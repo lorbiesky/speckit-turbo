@@ -7,13 +7,13 @@ O bootstrap oficial baixa somente um script pequeno do GitHub Raw e usa o Specif
 Linux/macOS:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.2/scripts/install-turbo.sh | sh -s -- .
+curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3/scripts/install-turbo.sh | sh -s -- .
 ```
 
 Windows PowerShell:
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.2/scripts/Install-Turbo.ps1)))
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3/scripts/Install-Turbo.ps1)))
 ```
 
 O diretório atual é o padrão. Para outro diretório, use `sh -s -- ./meu-projeto` ou execute o script PowerShell baixado com `-ProjectRoot .\meu-projeto`. O instalador é idempotente e apenas encadeia comandos oficiais do Spec Kit.
@@ -22,59 +22,40 @@ No PowerShell, use `ScriptBlock` como mostrado acima; isso evita que o pipeline 
 
 ## Projeto novo
 
-Inicialize o projeto com o fluxo oficial do Spec Kit e a integração desejada. Em seguida adicione os catálogos e instale o bundle Turbo:
+Inicialize o projeto com o fluxo oficial do Spec Kit e a integração desejada. Em seguida, execute o instalador de um comando:
 
 ```bash
 specify init --here --integration codex
-specify extension catalog add https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/extensions.json --name speckit-turbo --install-allowed
-specify workflow catalog add https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/workflows.json
-specify bundle catalog add https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/bundles.json --id speckit-turbo --policy install-allowed
-specify workflow add turbo-feature
-specify workflow add turbo-bugfix
-specify workflow add turbo-refactor
-specify workflow add turbo-maintenance
-specify workflow add turbo-hotfix
-specify workflow add turbo-discovery
-specify workflow add turbo-constitution
-specify bundle install speckit-turbo
+curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3/scripts/install-turbo.sh | sh -s -- .
 ```
 
-O bundle instala a extensão `turbo` e registra a composição dos sete workflows `turbo-*`; os sete comandos `specify workflow add` garantem a instalação dos workflows pelo caminho nativo compatível. A configuração é criada em `.specify/extensions/turbo/turbo-config.yml`; os assets upstream permanecem sob controle do Spec Kit.
+O instalador registra a extensão `turbo`, os sete workflows `turbo-*` e o bundle. A configuração é criada em `.specify/extensions/turbo/turbo-config.yml`; os assets upstream permanecem sob controle do Spec Kit.
 
 ## Projeto Spec Kit existente
 
-Execute os comandos de catálogo, instale os sete workflows com `specify workflow add` e finalize com `specify bundle install speckit-turbo`. A instalação é composicional: não altera `.specify/memory/constitution.md`, templates, scripts, comandos ou workflows já presentes. Se um componente tiver o mesmo id, o Spec Kit mostrará o conflito em vez de sobrescrevê-lo silenciosamente.
+Execute apenas o instalador de um comando na raiz do projeto. A instalação é composicional: não altera `.specify/memory/constitution.md`, templates, scripts, comandos ou workflows upstream já presentes. Workflows e extensão Turbo já instalados são atualizados de forma não interativa; configurações locais da extensão são preservadas.
 
-### Se aparecer `--dev source must be a workflow YAML`
+### Se a instalação falhar
 
-Isso significa que o bundle tentou delegar a instalação de um workflow antes que ele estivesse instalado. Não use `--dev` para corrigir essa mensagem. Execute os sete comandos de workflow da seção anterior e repita:
-
-```bash
-specify bundle install speckit-turbo
-```
-
-Se aparecer `HTTP Error 404` para `speckit-turbo-bundle-2.0.2.zip`, atualize os catálogos e confirme que o Spec Kit é `>=0.11.4`:
+Primeiro atualize o Spec Kit. Depois, execute novamente o instalador da release atual; ele substitui apenas as URLs de catálogo gerenciadas pelo Turbo.
 
 ```bash
 specify self upgrade
-specify bundle catalog remove speckit-turbo
-specify bundle catalog add https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/bundles.json --id speckit-turbo --policy install-allowed
+curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3/scripts/install-turbo.sh | sh -s -- .
 ```
 
-O identificador correto do bundle é `speckit-turbo`; nomes como `speckit-turboclear` não existem no catálogo.
+O identificador correto do bundle é `speckit-turbo`; nomes como `speckit-turboclear` não existem no catálogo. Não execute `specify workflow update` no bootstrap automatizado: o comando é interativo.
 
 ## Atualização
 
-Atualize primeiro o próprio Spec Kit e então os componentes instalados:
+Atualize primeiro o próprio Spec Kit e então execute novamente o instalador da release desejada:
 
 ```bash
 specify self upgrade
-specify extension update turbo
-specify workflow update
-specify bundle update speckit-turbo
+curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3/scripts/install-turbo.sh | sh -s -- .
 ```
 
-Revise os release notes e as diferenças antes de aprovar uma atualização. A configuração local da extensão não deve ser apagada por uma atualização.
+Revise os release notes antes de atualizar. A configuração local da extensão não deve ser apagada por uma atualização.
 
 ## Remoção
 

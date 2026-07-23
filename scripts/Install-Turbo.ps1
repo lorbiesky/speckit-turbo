@@ -3,7 +3,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$repositoryRoot = "https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.2"
+$repositoryRoot = "https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3"
 $extensionCatalog = "$repositoryRoot/catalogs/extensions.json"
 $workflowCatalog = "$repositoryRoot/catalogs/workflows.json"
 $bundleCatalog = "$repositoryRoot/catalogs/bundles.json"
@@ -41,18 +41,18 @@ try {
     Ensure-ManagedCatalog "bundle" $bundleCatalog $bundleConfig "bundles.json" @("--id", "speckit-turbo", "--policy", "install-allowed")
 
     $workflowIds = @("turbo-feature", "turbo-bugfix", "turbo-refactor", "turbo-maintenance", "turbo-hotfix", "turbo-discovery", "turbo-constitution")
-    $installedWorkflows = (& specify workflow list 2>&1 | Out-String)
     foreach ($workflowId in $workflowIds) {
-        if ($installedWorkflows -match "\($([regex]::Escape($workflowId))\)") {
-            & specify workflow update $workflowId
-        }
-        else {
-            & specify workflow add $workflowId
-        }
+        # `workflow update` prompts for confirmation. Catalog add is idempotent
+        # and refreshes only the managed workflow asset.
+        & specify workflow add $workflowId
     }
 
     if ((& specify extension list 2>&1 | Out-String) -match "turbo") {
-        & specify extension update turbo
+        # Preserve local extension configuration while refreshing managed files.
+        & specify extension add turbo --force
+    }
+    else {
+        & specify extension add turbo
     }
     & specify bundle install speckit-turbo
     if ((& specify extension list 2>&1 | Out-String) -notmatch "turbo") {

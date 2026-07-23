@@ -2,7 +2,7 @@ schema_version: "1.0"
 workflow:
   id: turbo-refactor
   name: "Turbo Refactor"
-  version: "2.0.2"
+  version: "2.0.3"
   author: lorbiesky
   description: "Behavior-preserving refactor with invariants, baseline, and comparison validation."
 requires: { speckit_version: ">=0.11.4" }

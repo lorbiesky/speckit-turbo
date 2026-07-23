@@ -24,34 +24,18 @@ Adicione os catálogos do Turbo ao projeto e instale o bundle. Isso é seguro ta
 Linux/macOS, sem clonar este repositório:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.2/scripts/install-turbo.sh | sh -s -- .
+curl -fsSL https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3/scripts/install-turbo.sh | sh -s -- .
 ```
 
 Windows PowerShell:
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.2/scripts/Install-Turbo.ps1)))
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3/scripts/Install-Turbo.ps1)))
 ```
 
-Para outro diretório, use `sh -s -- ./meu-projeto` no shell ou execute `& ([scriptblock]::Create((irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.2/scripts/Install-Turbo.ps1))) -ProjectRoot .\meu-projeto`. O bootstrap usa o Specify CLI e não instala Node, npm ou um runtime próprio.
+Para outro diretório, use `sh -s -- ./meu-projeto` no shell ou execute `& ([scriptblock]::Create((irm https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3/scripts/Install-Turbo.ps1))) -ProjectRoot .\meu-projeto`. O bootstrap usa o Specify CLI e não instala Node, npm ou um runtime próprio.
 
-```bash
-specify extension catalog add https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/extensions.json --name speckit-turbo --install-allowed
-specify workflow catalog add https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/workflows.json
-specify bundle catalog add https://raw.githubusercontent.com/lorbiesky/speckit-turbo/main/catalogs/bundles.json --id speckit-turbo --policy install-allowed
-specify workflow add turbo-feature
-specify workflow add turbo-bugfix
-specify workflow add turbo-refactor
-specify workflow add turbo-maintenance
-specify workflow add turbo-hotfix
-specify workflow add turbo-discovery
-specify workflow add turbo-constitution
-specify bundle install speckit-turbo
-```
-
-Os workflows são adicionados explicitamente antes do bundle para manter compatibilidade com versões do Specify CLI que delegam incorretamente a instalação de workflows de catálogo durante `bundle install`. A operação é idempotente; se já estiverem instalados, o Spec Kit apenas os reutiliza.
-
-Se o Specify mostrar `--dev source must be a workflow YAML`, os sete comandos `specify workflow add` ainda não foram executados. Se mostrar `HTTP Error 404` para o bundle, atualize o Spec Kit e recarregue o catálogo; o asset oficial `v2.0.2` está publicado no GitHub Releases.
+O instalador registra ou atualiza os três catálogos, reinstala os sete workflows gerenciados sem prompt, atualiza a extensão Turbo e instala o bundle. Ele também migra URLs de catálogos Turbo de releases anteriores para a versão atual. Não use `specify workflow update` durante essa operação: esse comando pede confirmação interativa.
 
 Consulte os componentes instalados com `specify extension list`, `specify workflow list` e `specify bundle list`. Para instruções completas, inclusive projeto novo, atualização e remoção, leia [o guia de instalação](docs/installation.md). Instalações legadas têm um [guia de migração seguro](docs/migration-npm.md).
 

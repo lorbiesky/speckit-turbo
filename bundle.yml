@@ -3,7 +3,7 @@ schema_version: "1.0"
 bundle:
   id: speckit-turbo
   name: "Spec Kit Turbo"
-  version: "2.0.2"
+  version: "2.0.3"
   role: "developer"
   description: "A native Spec Kit extension and workflows for auditable SDD, configurable TDD, visual specs, and Socratic constitution updates."
   author: "lorbiesky"
@@ -17,14 +17,14 @@ requires:
 provides:
   extensions:
     - id: turbo
-      version: "2.0.2"
+      version: "2.0.3"
   workflows:
-    - { id: turbo-feature, version: "2.0.2" }
-    - { id: turbo-bugfix, version: "2.0.2" }
-    - { id: turbo-refactor, version: "2.0.2" }
-    - { id: turbo-maintenance, version: "2.0.2" }
-    - { id: turbo-hotfix, version: "2.0.2" }
-    - { id: turbo-discovery, version: "2.0.2" }
-    - { id: turbo-constitution, version: "2.0.2" }
+    - { id: turbo-feature, version: "2.0.3" }
+    - { id: turbo-bugfix, version: "2.0.3" }
+    - { id: turbo-refactor, version: "2.0.3" }
+    - { id: turbo-maintenance, version: "2.0.3" }
+    - { id: turbo-hotfix, version: "2.0.3" }
+    - { id: turbo-discovery, version: "2.0.3" }
+    - { id: turbo-constitution, version: "2.0.3" }
 
 tags: ["sdd", "tdd", "visual-specification", "governance"]

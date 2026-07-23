@@ -4,7 +4,7 @@
 # resolution and installation to the native Specify CLI.
 set -eu
 
-REPOSITORY_ROOT="https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.2"
+REPOSITORY_ROOT="https://raw.githubusercontent.com/lorbiesky/speckit-turbo/v2.0.3"
 EXTENSION_CATALOG="$REPOSITORY_ROOT/catalogs/extensions.json"
 WORKFLOW_CATALOG="$REPOSITORY_ROOT/catalogs/workflows.json"
 BUNDLE_CATALOG="$REPOSITORY_ROOT/catalogs/bundles.json"
@@ -55,15 +55,16 @@ ensure_managed_catalog workflow "$WORKFLOW_CATALOG" .specify/workflow-catalogs.y
 ensure_managed_catalog bundle "$BUNDLE_CATALOG" .specify/bundle-catalogs.yml bundles.json --id speckit-turbo --policy install-allowed
 
 for workflow_id in turbo-feature turbo-bugfix turbo-refactor turbo-maintenance turbo-hotfix turbo-discovery turbo-constitution; do
-  if "$SPECIFY_BIN" workflow list 2>/dev/null | grep -Fq "($workflow_id)"; then
-    "$SPECIFY_BIN" workflow update "$workflow_id"
-  else
-    "$SPECIFY_BIN" workflow add "$workflow_id"
-  fi
+  # `workflow update` asks for interactive confirmation. Adding a catalog
+  # workflow is idempotent and replaces only that managed workflow asset.
+  "$SPECIFY_BIN" workflow add "$workflow_id"
 done
 
 if "$SPECIFY_BIN" extension list 2>/dev/null | grep -Fq 'turbo'; then
-  "$SPECIFY_BIN" extension update turbo
+  # Keep project configuration while refreshing the extension's managed files.
+  "$SPECIFY_BIN" extension add turbo --force
+else
+  "$SPECIFY_BIN" extension add turbo
 fi
 "$SPECIFY_BIN" bundle install speckit-turbo
 "$SPECIFY_BIN" extension list | grep -Fq 'turbo'

@@ -139,12 +139,16 @@ def validate_installers(errors: list[str]) -> None:
             fail(errors, "shell installer must not clone or install a Node runtime")
         if f"/v{VERSION}" not in text:
             fail(errors, "shell installer must use an immutable release tag matching VERSION")
+        if '"$SPECIFY_BIN" workflow update' in text:
+            fail(errors, "shell installer must not use interactive workflow update")
     if powershell_installer.is_file():
         text = powershell_installer.read_text(encoding="utf-8")
         if "Select-String" in text:
             fail(errors, "PowerShell installer must use literal catalog matching")
         if f"/v{VERSION}" not in text:
             fail(errors, "PowerShell installer must use an immutable release tag matching VERSION")
+        if "& specify workflow update" in text:
+            fail(errors, "PowerShell installer must not use interactive workflow update")
 
 
 def main() -> int:
