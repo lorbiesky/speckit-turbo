@@ -16,9 +16,9 @@
 
 ## Reproduction
 
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 If reproduction is unavailable, explain why and record the strongest available evidence.
 
